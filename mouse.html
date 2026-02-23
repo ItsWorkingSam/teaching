@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Skills Proficiency - Version 2.0</title>
+    <style>
+        :root { --primary: #2563eb; --success: #16a34a; --error: #dc2626; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --hint: #fef9c3; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; overflow-x: hidden; }
+        
+        .layout { display: flex; gap: 20px; max-width: 900px; width: 100%; align-items: flex-start; }
+        .container { flex: 1; }
+        
+        header { text-align: center; margin-bottom: 20px; }
+        .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
+        #progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.4s ease; }
+
+        .step-card { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; border: 1px solid #e2e8f0; min-height: 400px; position: relative; }
+        .step-card.active { display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .instruction { font-weight: 600; color: var(--primary); font-size: 1.1rem; margin-bottom: 10px; width: 100%; text-align: left; }
+        
+        /* On-screen Feedback */
+        #status-display { height: 24px; color: var(--error); font-weight: bold; margin-bottom: 15px; font-size: 0.9rem; text-align: center; width: 100%; }
+
+        .hint-box { width: 220px; background: var(--hint); border: 1px solid #fde047; padding: 15px; border-radius: 8px; font-size: 0.9rem; position: sticky; top: 20px; }
+        .hint-title { font-weight: bold; color: #854d0e; display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 0.75rem; }
+
+        /* Custom Context Menu */
+        #custom-menu { position: absolute; background: white; border: 1px solid #ccc; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); display: none; z-index: 1000; min-width: 140px; padding: 5px 0; border-radius: 4px; }
+        .menu-item { padding: 8px 15px; cursor: pointer; font-size: 0.9rem; }
+        .menu-item:hover { background: var(--primary); color: white; }
+
+        .target-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .target-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        /* Hover Exercise Fix */
+        .hover-trigger { width: 160px; height: 160px; background: #1e293b; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .hidden-btn { display: none; }
+        .hover-trigger:hover .hidden-btn { display: block; }
+
+        /* Maze Logic */
+        .maze-container { width: 300px; height: 180px; background: #fff; position: relative; border: 2px solid #334155; display: none; }
+        .maze-wall { background: #334155; position: absolute; }
+        #countdown-overlay { font-size: 3rem; font-weight: bold; color: var(--primary); }
+
+        /* General elements */
+        .scroll-box { border: 2px solid #cbd5e1; background: #f1f5f9; border-radius: 8px; }
+        .v-scroll { width: 100%; height: 150px; overflow-y: scroll; }
+        .h-scroll { width: 250px; height: 100px; overflow-x: scroll; white-space: nowrap; padding: 20px; }
+        .draggable { width: 50px; height: 50px; background: #ef4444; border-radius: 4px; cursor: grab; }
+        .dropzone { width: 80px; height: 80px; border: 3px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .hold-btn-container { width: 200px; height: 12px; background: #e2e8f0; border-radius: 6px; margin-top: 15px; overflow: hidden; }
+        #hold-fill { height: 100%; background: var(--success); width: 0%; }
+        .btn-reset { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="custom-menu">
+    <div class="menu-item" onclick="nextStep()">Continue Activity</div>
+    <div class="menu-item" onclick="showFeedback('Incorrect option')">Properties</div>
+    <div class="menu-item" onclick="showFeedback('Incorrect option')">Delete</div>
+</div>
+
+<div class="layout">
+    <div class="container">
+        <header>
+            <h1>Mouse Skills Proficiency</h1>
+            <div class="progress-bar"><div id="progress-fill"></div></div>
+            <p id="level-indicator" style="font-weight: bold;">Activity 1 of 17</p>
+        </header>
+
+        <div id="status-display"></div>
+
+        <div id="exercise-wrapper">
+            <div id="ex1" class="step-card active"><p class="instruction">1. Click the button.</p><button class="target-btn" onclick="nextStep()">Continue</button></div>
+            
+            <div id="ex2" class="step-card"><p class="instruction">2. Double-click the folder icon.</p><div id="dbClickTarget" style="font-size: 60px; cursor: pointer;">📁</div></div>
+
+            <div id="ex3" class="step-card">
+                <p class="instruction">3. Right-click the box and select "Continue Activity".</p>
+                <div id="rightClickArea" style="width:250px; height:120px; background:#e2e8f0; border:2px dashed #94a3b8; border-radius:8px; display:flex; align-items:center; justify-content:center;">Context Menu Zone</div>
+            </div>
+
+            <div id="ex4" class="step-card">
+                <p class="instruction">4. Scroll to the bottom to find the button.</p>
+                <div class="scroll-box v-scroll"><div style="height:800px; display:flex; flex-direction:column; justify-content:flex-end; padding:20px;"><button class="target-btn" onclick="nextStep()">Bottom Found</button></div></div>
+            </div>
+
+            <div id="ex5" class="step-card">
+                <p class="instruction">5. Hover over the box and click the button that appears.</p>
+                <div class="hover-trigger"><button class="target-btn hidden-btn" onclick="nextStep()">Revealed</button></div>
+            </div>
+
+            <div id="ex6" class="step-card">
+                <p class="instruction">6. Drag the red square into the target.</p>
+                <div class="drag-area"><div class="draggable" draggable="true" id="drag1"></div><div class="dropzone" id="drop1">Target</div></div>
+            </div>
+
+            <div id="ex7" class="step-card">
+                <p class="instruction">7. Click the small red dot.</p>
+                <div style="width:100%; height:150px; position:relative; background:#f1f5f9;"><div id="precision-target" style="width:8px; height:8px; background:red; border-radius:50%; cursor:crosshair; position:absolute; top:30%; left:80%;" onclick="nextStep()"></div></div>
+            </div>
+
+            <div id="ex8" class="step-card">
+                <p class="instruction">8. Click and hold the button until the bar fills.</p>
+                <button class="target-btn" id="hold-trigger">Hold Me</button>
+                <div class="hold-btn-container"><div id="hold-fill"></div></div>
+            </div>
+
+            <div id="ex9" class="step-card">
+                <p class="instruction">9. Check only the "Required" boxes.</p>
+                <div>
+                    <label><input type="checkbox" class="cb-check" data-req="true"> Required</label><br>
+                    <label><input type="checkbox" class="cb-check" data-req="false"> Optional</label><br>
+                    <label><input type="checkbox" class="cb-check" data-req="true"> Required</label>
+                </div>
+            </div>
+
+            <div id="ex10" class="step-card">
+                <p class="instruction">10. Scroll right to find the button.</p>
+                <div class="scroll-box h-scroll"><div style="width:1000px; text-align:right;"><button class="target-btn" onclick="nextStep()">Found</button></div></div>
+            </div>
+
+            <div id="ex11" class="step-card"><p class="instruction">11. Triple-click the text block.</p><p id="tripleTarget" style="padding:15px; border:1px solid #ddd; user-select:all;">Click three times rapidly to select this entire paragraph.</p></div>
+
+            <div id="ex12" class="step-card">
+                <p class="instruction">12. Navigate the maze without hitting walls.</p>
+                <div id="countdown-overlay"></div>
+                <button id="start-maze-btn" class="target-btn" onclick="startMazeCountdown()">Start Challenge</button>
+                <div class="maze-container" id="maze-box" onmouseleave="handleMazeWall()">
+                    <div style="position:absolute; left:0; top:0; background:var(--success); color:white; padding:4px; font-size:10px;">START</div>
+                    <div class="maze-wall" style="width:220px; height:30px; top:50px; left:0;"></div>
+                    <div class="maze-wall" style="width:220px; height:30px; bottom:50px; right:0;"></div>
+                    <div id="maze-end" style="position:absolute; right:0; bottom:0; background:var(--primary); color:white; padding:4px; font-size:10px;" onmouseover="nextStep()">END</div>
+                </div>
+            </div>
+
+            <div id="ex13" class="step-card">
+                <p class="instruction">13. Double-click to edit, then type "DONE".</p>
+                <div id="editTarget" style="padding:10px; border:1px solid #ccc; cursor:pointer;">Double-click to start</div>
+                <input type="text" id="editInput" style="display:none; margin-top:10px; padding:8px;">
+            </div>
+
+            <div id="ex14" class="step-card"><p class="instruction">14. Select the 'Standard' radio option.</p><div><label><input type="radio" name="opt"> Express</label><br><label><input type="radio" name="opt" onchange="nextStep()"> Standard</label></div></div>
+
+            <div id="ex15" class="step-card"><p class="instruction">15. Hover the icon; type the revealed code.</p><div title="PASS44" style="font-size:30px;">ℹ️</div><input type="text" id="tooltipInput" placeholder="Enter code" style="margin-top:10px;"></div>
+
+            <div id="ex16" class="step-card"><p class="instruction">16. Click the button 5 times.</p><button class="target-btn" id="multiClickBtn">Clicks: 0/5</button></div>
+
+            <div id="ex17" class="step-card"><p class="instruction">17. Highlight "MOUSE-COMPLETE".</p><div id="finalSelection" style="background:white; padding:15px; border:1px solid #ccc; user-select:text;">STATUS: MOUSE-COMPLETE-2026</div></div>
+
+            <div id="success-screen" style="display:none; text-align:center;">
+                <h2 style="color: var(--success);">🎉 Assessment Complete</h2>
+                <button class="btn-reset" onclick="location.reload()">Restart Training</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="hint-box">
+        <span class="hint-title">Instruction</span>
+        <p id="hint-text"></p>
+    </aside>
+</div>
+
+<script>
+    const hints = ["Left-click the blue button.", "Double-click the folder icon.", "Right-click and select the first menu option.", "Scroll down using the mouse wheel.", "The button is hidden until you hover the box.", "Drag the red square into the target zone.", "Click the red pixel.", "Hold the left button down.", "Select required checkboxes only.", "Scroll the bottom bar to the right.", "Click three times in quick succession.", "Stay on the white path. Do not touch walls.", "Double-click, then type DONE.", "Click the 'Standard' option.", "Hover the 'i' icon and wait for the label.", "Click five times rapidly.", "Highlight the final code."];
+    const steps = ['ex1','ex2','ex3','ex4','ex5','ex6','ex7','ex8','ex9','ex10','ex11','ex12','ex13','ex14','ex15','ex16','ex17'];
+    let currentStep = 0;
+
+    function showFeedback(msg, isError = true) {
+        const display = document.getElementById('status-display');
+        display.innerText = msg;
+        display.style.color = isError ? 'var(--error)' : 'var(--success)';
+        setTimeout(() => { display.innerText = ''; }, 2500);
+    }
+
+    function nextStep() {
+        document.getElementById('custom-menu').style.display = 'none';
+        document.getElementById(steps[currentStep]).classList.remove('active');
+        currentStep++;
+        if (currentStep < steps.length) {
+            document.getElementById(steps[currentStep]).classList.add('active');
+            updateUI();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            document.getElementById('success-screen').style.display = 'block';
+            document.querySelector('.hint-box').style.display = 'none';
+        }
+    }
+
+    function updateUI() {
+        const percent = (currentStep / steps.length) * 100;
+        document.getElementById('progress-fill').style.width = percent + '%';
+        document.getElementById('level-indicator').innerText = `Activity ${currentStep + 1} of ${steps.length}`;
+        document.getElementById('hint-text').innerText = hints[currentStep] || "";
+    }
+
+    // Maze Logic
+    function startMazeCountdown() {
+        const btn = document.getElementById('start-maze-btn');
+        const overlay = document.getElementById('countdown-overlay');
+        const maze = document.getElementById('maze-box');
+        btn.style.display = 'none';
+        let count = 3;
+        overlay.innerText = count;
+        
+        const int = setInterval(() => {
+            count--;
+            if (count > 0) {
+                overlay.innerText = count;
+            } else if (count === 0) {
+                overlay.innerText = "GO!";
+            } else {
+                clearInterval(int);
+                overlay.style.display = 'none';
+                maze.style.display = 'block';
+            }
+        }, 1000);
+    }
+
+    function handleMazeWall() {
+        if (currentStep === 11) {
+            showFeedback("Wall hit! Resetting maze...");
+            document.getElementById('maze-box').style.display = 'none';
+            document.getElementById('countdown-overlay').style.display = 'block';
+            document.getElementById('start-maze-btn').style.display = 'block';
+        }
+    }
+
+    // Custom Context Menu
+    const area = document.getElementById('rightClickArea');
+    const menu = document.getElementById('custom-menu');
+    area.oncontextmenu = (e) => {
+        e.preventDefault();
+        menu.style.display = 'block';
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+    };
+    document.onclick = () => menu.style.display = 'none';
+
+    // Drag and Drop
+    const d = document.getElementById('drag1');
+    const z = document.getElementById('drop1');
+    d.ondragstart = (e) => e.dataTransfer.setData('t', '1');
+    z.ondragover = (e) => e.preventDefault();
+    z.ondrop = nextStep;
+
+    // Double Click & Hold logic
+    document.getElementById('dbClickTarget').ondblclick = nextStep;
+    let holdInt, holdVal = 0;
+    const hBtn = document.getElementById('hold-trigger');
+    const hFill = document.getElementById('hold-fill');
+    hBtn.onmousedown = () => {
+        holdInt = setInterval(() => {
+            holdVal += 2;
+            hFill.style.width = holdVal + '%';
+            if(holdVal >= 100) { clearInterval(holdInt); nextStep(); }
+        }, 30);
+    };
+    hBtn.onmouseup = hBtn.onmouseleave = () => { clearInterval(holdInt); holdVal = 0; hFill.style.width = '0%'; };
+
+    // Checkboxes
+    document.querySelectorAll('.cb-check').forEach(cb => {
+        cb.onchange = () => {
+            const reqs = Array.from(document.querySelectorAll('.cb-check[data-req="true"]')).every(c => c.checked);
+            const opts = Array.from(document.querySelectorAll('.cb-check[data-req="false"]')).every(c => !c.checked);
+            if(reqs && opts) nextStep();
+        }
+    });
+
+    // Inputs & Misc
+    document.getElementById('tripleTarget').onclick = (e) => { if (e.detail === 3) nextStep(); };
+    document.querySelectorAll('.maze-wall').forEach(w => w.onmouseover = handleMazeWall);
+    document.getElementById('editTarget').ondblclick = function() {
+        this.style.display = 'none';
+        const i = document.getElementById('editInput');
+        i.style.display = 'block'; i.focus();
+    };
+    document.getElementById('editInput').oninput = function() { if(this.value.toUpperCase() === 'DONE') nextStep(); };
+    document.getElementById('tooltipInput').oninput = function() { if(this.value.toUpperCase() === 'PASS44') nextStep(); };
+    let cks = 0;
+    document.getElementById('multiClickBtn').onclick = function() {
+        cks++; this.innerText = `Clicks: ${cks}/5`;
+        if(cks >= 5) nextStep();
+    };
+    document.addEventListener('selectionchange', () => {
+        if(currentStep === 16 && window.getSelection().toString().includes('MOUSE-COMPLETE')) nextStep();
+    });
+
+    updateUI();
+</script>
+</body>
+</html>
