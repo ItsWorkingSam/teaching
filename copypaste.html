@@ -4,44 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Copy & Paste Practice</title>
-    <style>
-        :root { --primary: #2563eb; --success: #16a34a; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --hint: #fef9c3; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        
-        .layout { display: flex; gap: 20px; max-width: 900px; width: 100%; align-items: flex-start; }
-        .container { flex: 1; }
-        
-        header { text-align: center; margin-bottom: 20px; }
-        .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
-        #progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.4s ease; }
+	<link rel="stylesheet" href="./css/training.css">
+	<style>
+	.copy-source {
+		background: #f1f5f9;
+		border: 2px dashed #cbd5e1;
+		border-radius: 8px;
+		padding: 14px;
+		font-family: monospace;
+		user-select: text;
+	}
+	.source-area {
+		background: #f1f5f9;
+		border: 1px solid #cbd5e1;
+		padding: 15px;
+		margin: 15px 0;
+		border-radius: 6px;
+		position: relative;
+	}
+	
+	.paste-target {
+		width: 100%;
+		min-height: 100px;
+		border: 2px solid #cbd5e1;
+		border-radius: 8px;
+		padding: 12px;
+		font-size: 1rem;
+		resize: vertical;
+	}
+	.image-paste-zone {
+		width: 220px;
+		height: 160px;
+		border: 2px dashed #94a3b8;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		background: #f8fafc;
+		color: #64748b;
+		font-size: 0.9rem;
+	}
 
-        .step-card { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; border: 1px solid #e2e8f0; }
-        .step-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+	.image-paste-zone img {
+		max-width: 100%;
+		max-height: 100%;
+		border-radius: 6px;
+	}
+	.copy-table {
+		border-collapse: collapse;
+		width: 100%;
+		margin-top: 10px;
+	}
 
-        .source-area { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 15px; margin: 15px 0; border-radius: 6px; position: relative; }
-        .instruction { font-weight: 600; color: var(--primary); font-size: 1.1rem; margin: 0; }
-        
-        /* Hint Sidebar */
-        .hint-box { width: 220px; background: var(--hint); border: 1px solid #fde047; padding: 15px; border-radius: 8px; font-size: 0.9rem; position: sticky; top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .hint-title { font-weight: bold; color: #854d0e; display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 0.75rem; }
+	.copy-table td,
+	.copy-table th {
+		border: 1px solid #cbd5e1;
+		padding: 8px;
+		text-align: left;
+	}
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-size: 0.9rem; }
+	.copy-table th {
+		background: #e2e8f0;
+		font-weight: 600;
+	}
 
-        input, textarea { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 1rem; margin-top: 10px; box-sizing: border-box; font-family: inherit; }
-        .readonly-source { background: #fff; cursor: text; resize: none; font-family: monospace; }
-        
-        #image-paste-zone { width: 100%; min-height: 100px; border: 2px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-top: 10px; color: #64748b; }
-        #image-paste-zone img { max-width: 100%; max-height: 120px; }
-        
-        .copy-btn { background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; float: right; }
-        .copy-btn:active { background: #334155; }
-
-        .btn-reset { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; }
-
-        @media (max-width: 800px) { .layout { flex-direction: column; } .hint-box { width: auto; position: static; } }
-    </style>
+</style>
 </head>
 <body>
 
@@ -98,6 +126,7 @@
         <p id="hint-text">Click and drag your mouse over the text to turn it blue, then right-click to copy.</p>
     </aside>
 </div>
+<script src="./js/training-core.js"></script>
 
 <script>
     const hints = [
@@ -138,35 +167,12 @@
         { id: 'ex16', inputId: 'in15', target: '$500' }
     ];
 
-    let currentStep = 0;
-
     function clean(str) { return str ? str.trim().toLowerCase().replace(/\/$/, "") : ""; }
 
     function copyValue(val) {
         navigator.clipboard.writeText(val);
-        alert("Copied to clipboard!");
     }
 
-    function updateUI() {
-        const percent = (currentStep / steps.length) * 100;
-        document.getElementById('progress-fill').style.width = percent + '%';
-        document.getElementById('level-indicator').innerText = `Activity ${currentStep + 1} of ${steps.length}`;
-        document.getElementById('hint-text').innerText = hints[currentStep] || "";
-    }
-
-    function nextStep() {
-        document.getElementById(steps[currentStep].id).classList.remove('active');
-        currentStep++;
-        if (currentStep < steps.length) {
-            document.getElementById(steps[currentStep].id).classList.add('active');
-            updateUI();
-        } else {
-            document.getElementById('progress-fill').style.width = '100%';
-            document.getElementById('level-indicator').style.display = 'none';
-            document.getElementById('success-screen').style.display = 'block';
-            document.querySelector('.hint-box').style.display = 'none';
-        }
-    }
 
     steps.forEach((step) => {
         if (step.type === 'image') {
@@ -194,7 +200,9 @@
         }
     });
 
-    updateUI();
+	window.addEventListener("DOMContentLoaded", () => {
+		initTraining({ hints, steps });
+	});
 </script>
 </body>
 </html>
