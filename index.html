@@ -106,10 +106,8 @@
 </main>
 
 <script>
-    // Initialize Lucide
     lucide.createIcons();
 
-    // Theme Logic
     const storageKey = 'theme-preference';
     const toggle = document.querySelector('#theme-toggle');
     
@@ -123,7 +121,6 @@
         localStorage.setItem(storageKey, theme);
     };
 
-    // Set initial
     setTheme(getColorPreference());
 
     toggle.addEventListener('click', () => {
@@ -131,7 +128,6 @@
         setTheme(current === 'dark' ? 'light' : 'dark');
     });
 
-    // Sync with system changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({matches}) => {
         setTheme(matches ? 'dark' : 'light');
     });
