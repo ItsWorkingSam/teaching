@@ -337,6 +337,47 @@ textarea.validated:invalid:not(:placeholder-shown) {
 	75% { transform: translateX(6px); }
 }
 
+/* Big, obvious "you got it" flash on the box the user pasted into */
+.flash-correct {
+	border-color: var(--success) !important;
+	background: var(--success-soft) !important;
+	color: var(--success) !important;
+	box-shadow: 0 0 0 4px var(--success-soft) !important;
+	animation: correctPop 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+	position: relative;
+}
+
+@keyframes correctPop {
+	0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45); }
+	30% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+	60% { transform: scale(0.99); }
+	100% { transform: scale(1); box-shadow: 0 0 0 4px var(--success-soft); }
+}
+
+/* Inline "correct" confirmation pill shown under the pasted box */
+.correct-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 12px;
+	padding: 9px 16px;
+	border-radius: 999px;
+	background: var(--success-soft);
+	color: var(--success);
+	font-weight: 700;
+	font-size: 0.95rem;
+	border: 1px solid var(--success);
+	animation: pillPop 0.5s cubic-bezier(0.22, 1.4, 0.4, 1);
+}
+
+.correct-pill .ph { font-size: 1.25rem; }
+
+@keyframes pillPop {
+	0% { transform: scale(0.6) translateY(6px); opacity: 0; }
+	60% { transform: scale(1.06); opacity: 1; }
+	100% { transform: scale(1); opacity: 1; }
+}
+
 label {
 	font-size: 0.85rem;
 	font-weight: 600;

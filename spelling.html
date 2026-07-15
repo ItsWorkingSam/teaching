@@ -3,808 +3,117 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Spelling Practice</title>
+	<title>Spelling: Choose a Level</title>
 
 	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 	<link rel="stylesheet" href="./css/training.css">
 
 	<style>
-		.q-type-tag {
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			font-size: 0.72rem;
-			font-weight: 800;
-			letter-spacing: 0.06em;
-			text-transform: uppercase;
-			color: var(--primary);
-			background: var(--primary-soft);
-			padding: 5px 11px;
-			border-radius: 999px;
-			margin-bottom: 14px;
+		.hub { max-width: 780px; width: 100%; }
+
+		.tier { margin-bottom: 30px; }
+
+		.tier-head {
+			display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+		}
+		.tier-icon {
+			display: grid; place-items: center; width: 42px; height: 42px;
+			border-radius: 12px; background: var(--primary-soft); color: var(--primary);
+			font-size: 1.4rem; flex-shrink: 0;
+		}
+		.tier-head h2 { margin: 0; font-size: 1.15rem; font-weight: 700; border: none; padding: 0; }
+		.tier-head .tier-blurb { margin: 2px 0 0; font-size: 0.85rem; color: var(--muted); }
+		.tier-badge {
+			margin-left: auto; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em;
+			text-transform: uppercase; color: var(--primary); background: var(--primary-soft);
+			padding: 5px 11px; border-radius: 999px; white-space: nowrap;
 		}
 
-		.sentence {
-			font-size: 1.15rem;
-			line-height: 1.7;
-			margin: 4px 0 16px;
-			color: var(--text);
+		.set-grid {
+			display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px;
 		}
-
-		.sentence .blank {
-			display: inline-block;
-			min-width: 70px;
-			border-bottom: 3px solid var(--primary);
-			text-align: center;
-			font-weight: 700;
-			color: var(--primary);
+		.set-card {
+			display: flex; flex-direction: column; gap: 6px; padding: 18px 20px;
+			border-radius: var(--radius); border: 1px solid var(--border); background: var(--card);
+			box-shadow: var(--shadow-md); text-decoration: none; color: var(--text);
+			transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 		}
-
-		.wrong-word {
-			text-decoration: underline wavy var(--error);
-			text-underline-offset: 4px;
-			font-weight: 700;
+		.set-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+		.set-card h3 { margin: 0; font-size: 1.05rem; font-weight: 700; }
+		.set-card p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
+		.set-card .meta-row {
+			display: flex; align-items: center; justify-content: space-between; margin-top: 8px;
 		}
+		.set-card .count { font-size: 0.8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+		.set-card .go { font-weight: 700; font-size: 0.85rem; color: var(--primary); display: inline-flex; align-items: center; gap: 5px; }
 
-		.letter-row {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-			align-items: center;
-			margin: 8px 0 16px;
+		@media (max-width: 560px) {
+			.tier-badge { display: none; }
 		}
-
-		.fixed-letter,
-		.letter-input {
-			width: 46px;
-			height: 54px;
-			display: grid;
-			place-items: center;
-			border-radius: var(--radius-sm);
-			font-size: 1.5rem;
-			font-weight: 700;
-			text-transform: lowercase;
-		}
-
-		.fixed-letter {
-			background: var(--card-2);
-			border: 2px solid var(--border);
-			color: var(--muted);
-		}
-
-		.letter-input {
-			border: 2px solid var(--primary);
-			background: var(--card);
-			color: var(--text);
-			text-align: center;
-			font-family: inherit;
-			outline: none;
-			padding: 0;
-			box-shadow: 0 0 0 4px var(--primary-soft);
-		}
-
-		.letter-input:focus { border-color: var(--primary-strong); }
-
-		.controls {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-			align-items: center;
-			margin-top: 4px;
-		}
-
-		.spacer { flex: 1; }
-
-		.mini-note {
-			font-size: 0.85rem;
-			color: var(--muted);
-			margin-top: 12px;
-		}
-
-		/* Help / escape system */
-		.help-bar {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-			align-items: center;
-			margin-top: 22px;
-			padding-top: 16px;
-			border-top: 1px dashed var(--border);
-		}
-
-		.help-btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 7px;
-			padding: 9px 15px;
-			border-radius: 999px;
-			border: 1px solid var(--border-strong);
-			background: var(--card);
-			color: var(--text);
-			font-weight: 600;
-			font-size: 0.88rem;
-			font-family: inherit;
-			cursor: pointer;
-			transition: background 0.15s ease, border-color 0.15s ease;
-		}
-
-		.help-btn:hover { background: var(--card-2); border-color: var(--primary); }
-		.help-btn i { color: var(--primary); font-size: 1.05rem; }
-		.help-btn.danger:hover { border-color: var(--error); }
-		.help-btn.danger i { color: var(--error); }
-		.help-btn:disabled { opacity: 0.5; cursor: default; }
-
-		.field-revealed {
-			border-color: var(--primary) !important;
-			background: var(--primary-soft) !important;
-			color: var(--text) !important;
-		}
-
-		.option.revealed { border-color: var(--primary); background: var(--primary-soft); }
-		.slot.revealed { background: var(--primary-soft); color: var(--primary); }
 	</style>
 </head>
 <body>
 
-<div class="layout">
-	<div class="container">
-		<div class="app-bar">
-			<a class="brand" href="exercises.html">
-				<span class="brand-mark"><i class="ph-bold ph-pencil-simple"></i></span>
-				Spelling
-			</a>
-			<div class="header-actions">
-				<a class="icon-btn" href="index.html" aria-label="Home" title="Home"><i class="ph-bold ph-house"></i></a>
-				<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
-			</div>
-		</div>
-
-		<header style="text-align:left;">
-			<h1>Spelling Practice</h1>
-			<p class="subtitle">Listen, unscramble, fix and choose. A mix of activities to sharpen your spelling.</p>
-			<div class="progress-bar"><div id="progress-fill"></div></div>
-			<p id="level-indicator">Question 1 of 16</p>
-		</header>
-
-		<div id="status-display"></div>
-
-		<div id="quiz-card" class="step-card active"></div>
-
-		<div id="success-screen" style="display:none;">
-			<div class="success-emoji">🎉</div>
-			<h2>Great spelling!</h2>
-			<p>You worked through every activity.</p>
-			<div class="score-pill" id="final-score">Score: 0 / 16</div>
-			<div class="btn-row" style="justify-content:center;">
-				<button class="btn" onclick="location.reload()"><i class="ph-bold ph-arrow-clockwise"></i>&nbsp; Try Again</button>
-				<a class="btn btn-ghost" href="exercises.html"><i class="ph-bold ph-squares-four"></i>&nbsp; More Exercises</a>
-			</div>
+<main class="hub">
+	<div class="app-bar">
+		<a class="brand" href="exercises.html">
+			<span class="brand-mark"><i class="ph-bold ph-pencil-simple"></i></span>
+			Spelling
+		</a>
+		<div class="header-actions">
+			<a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four"></i></a>
+			<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
 		</div>
 	</div>
 
-	<aside class="hint-box">
-		<span class="hint-title"><i class="ph-bold ph-lightbulb"></i> Helpful Hint</span>
-		<p id="hint-text"></p>
-	</aside>
-</div>
+	<header style="text-align:left; margin-bottom: 26px;">
+		<h1>Spelling Practice</h1>
+		<p class="subtitle">Choose a level to begin. Each set is a short mix of listening, unscrambling, fixing mistakes and choosing the right word. Start where you're comfortable and work your way up.</p>
+	</header>
+
+	<div id="tiers"></div>
+</main>
 
 <script src="./js/training-core.js"></script>
+<script src="./js/spelling-sets.js"></script>
 <script>
-/* ============================================================
-   Spelling engine
-   ============================================================ */
+	(function () {
+		const tiers = window.SPELLING_TIERS || [];
+		const sets = window.SPELLING_SETS || {};
+		const root = document.getElementById("tiers");
 
-const QUESTIONS = [
-	{
-		type: "dictation",
-		word: "necessary",
-		sentence: "It is necessary to bring a pen and paper.",
-		hint: "Listen carefully. One c, two s's. Trick: 'one Collar, two Sleeves'."
-	},
-	{
-		type: "choice",
-		prompt: "Which spelling is correct?",
-		options: ["definately", "definitely", "definitly", "defenitely"],
-		answer: "definitely",
-		hint: "It hides the word 'finite'. There is no 'a' anywhere in it."
-	},
-	{
-		type: "missing",
-		word: "separate",
-		blanks: [3],
-		hint: "A very common mistake is 'seperate'. Remember there's 'a rat' in sep-A-Rate."
-	},
-	{
-		type: "homophone",
-		before: "The dog wagged ",
-		after: " tail happily.",
-		options: ["its", "it's"],
-		answer: "its",
-		hint: "\"it's\" always means \"it is\". Here we mean the tail belonging to the dog, so use 'its'."
-	},
-	{
-		type: "unscramble",
-		word: "rhythm",
-		hint: "No standard vowels! Try: 'Rhythm Helps Your Two Hips Move'."
-	},
-	{
-		type: "suffix",
-		base: "happy",
-		suffix: "ness",
-		answer: "happiness",
-		rule: "When a word ends in a consonant + y, change the y to i before adding the ending.",
-		hint: "happy → happi → happiness. The y becomes an i."
-	},
-	{
-		type: "dictation",
-		word: "embarrass",
-		sentence: "Don't embarrass yourself in front of the class.",
-		hint: "Double r AND double s. It's 'really' embarrassing to get it wrong!"
-	},
-	{
-		type: "plural",
-		singular: "knife",
-		answer: "knives",
-		hint: "Many words ending in 'fe' change to 'ves' in the plural: knife → knives."
-	},
-	{
-		type: "choice",
-		prompt: "Which spelling is correct?",
-		options: ["accomodate", "acommodate", "accommodate", "acomodate"],
-		answer: "accommodate",
-		hint: "It's big enough to accommodate a lot of letters: two c's AND two m's."
-	},
-	{
-		type: "homophone",
-		before: "",
-		after: " going to love this show.",
-		options: ["Their", "There", "They're"],
-		answer: "They're",
-		hint: "You can split it into 'They are'. 'They are going to love this show.'"
-	},
-	{
-		type: "missing",
-		word: "occurrence",
-		blanks: [2, 5],
-		hint: "Double c and double r: oc-CUR-rence. A tricky one to remember."
-	},
-	{
-		type: "suffix",
-		base: "run",
-		suffix: "ing",
-		answer: "running",
-		rule: "Short words ending in one vowel + one consonant usually double the final consonant before -ing.",
-		hint: "run has one vowel + one consonant, so double the n: running."
-	},
-	{
-		type: "dictation",
-		word: "government",
-		sentence: "The government announced a new plan today.",
-		hint: "Don't forget the hidden n: govern-ment. Say 'govern' then add 'ment'."
-	},
-	{
-		type: "correct",
-		before: "We ate at a lovely ",
-		wrong: "resturant",
-		answer: "restaurant",
-		after: " by the beach.",
-		hint: "There's an 'au' in the middle: rest-AU-rant."
-	},
-	{
-		type: "homophone",
-		before: "",
-		after: " book is on the table.",
-		options: ["Your", "You're"],
-		answer: "Your",
-		hint: "'You're' means 'you are'. Here the book belongs to you, so use 'Your'."
-	},
-	{
-		type: "plural",
-		singular: "potato",
-		answer: "potatoes",
-		hint: "potato, tomato and hero all add 'es': potato → potatoes."
-	}
-];
+		root.innerHTML = tiers.map(tier => {
+			const cards = tier.sets.map(key => {
+				const set = sets[key];
+				if (!set) return "";
+				const count = set.questions.length;
+				const title = set.meta.title || key;
+				const subtitle = set.meta.subtitle || "";
+				return `
+					<a class="set-card" href="spelling-set.html?set=${encodeURIComponent(key)}">
+						<h3>${title}</h3>
+						<p>${subtitle}</p>
+						<div class="meta-row">
+							<span class="count"><i class="ph-bold ph-list-numbers"></i> ${count} questions</span>
+							<span class="go">Start <i class="ph-bold ph-arrow-right"></i></span>
+						</div>
+					</a>`;
+			}).join("");
 
-const TYPE_META = {
-	dictation: { label: "Listen & spell", icon: "ph-ear" },
-	choice: { label: "Choose the correct spelling", icon: "ph-list-checks" },
-	missing: { label: "Fill the missing letters", icon: "ph-dots-three-outline" },
-	homophone: { label: "Choose the right word", icon: "ph-arrows-split" },
-	unscramble: { label: "Unscramble the word", icon: "ph-shuffle" },
-	suffix: { label: "Add the ending", icon: "ph-plus-circle" },
-	plural: { label: "Make it plural", icon: "ph-stack" },
-	correct: { label: "Fix the mistake", icon: "ph-eraser" }
-};
-
-const PRAISE = ["Correct!", "Nice work!", "Perfect!", "Well spelled!", "That's it!", "Excellent!"];
-
-let qi = 0;
-let score = 0;
-let attempts = 0;
-let hintLevel = 0;
-let revealedCount = 0;
-let locked = false;
-
-const card = document.getElementById("quiz-card");
-
-function norm(s) {
-	return (s || "").toLowerCase().trim().replace(/\s+/g, " ");
-}
-
-function speakBtnHTML(label, extraClass) {
-	return `<button class="speak-btn ${extraClass || ""}" data-speak>
-		<i class="ph-bold ph-speaker-high"></i> ${label}
-	</button>`;
-}
-
-function updateProgress() {
-	document.getElementById("progress-fill").style.width =
-		(qi / QUESTIONS.length) * 100 + "%";
-	document.getElementById("level-indicator").innerText =
-		`Question ${qi + 1} of ${QUESTIONS.length}`;
-}
-
-function setHint(text) {
-	document.getElementById("hint-text").innerText = text || "";
-}
-
-function spellOut(word) {
-	return word.toUpperCase().split("").join(" · ");
-}
-
-function handleCorrect() {
-	if (locked) return;
-	locked = true;
-	score++;
-	showToast(PRAISE[qi % PRAISE.length], "success", 900);
-	qi++;
-	setTimeout(() => {
-		locked = false;
-		if (qi < QUESTIONS.length) loadQuestion();
-		else finish();
-	}, 950);
-}
-
-function handleWrong(el, q) {
-	attempts++;
-	if (el) {
-		el.classList.remove("field-wrong");
-		void el.offsetWidth;
-		el.classList.add("field-wrong");
-	}
-	if (attempts >= 3) {
-		showToast("Stuck? Try “Hint” or “Show answer” below", "info", 1800);
-	} else if (attempts >= 2) {
-		giveHint(q);
-	} else {
-		showToast("Not quite — try again", "error", 1400);
-	}
-}
-
-/* ---------- Renderers ---------- */
-
-function typeTag(type) {
-	const m = TYPE_META[type];
-	return `<span class="q-type-tag"><i class="ph-bold ${m.icon}"></i> ${m.label}</span>`;
-}
-
-function loadQuestion() {
-	const q = QUESTIONS[qi];
-	attempts = 0;
-	hintLevel = 0;
-	updateProgress();
-	setHint(q.hint || "");
-
-	card.classList.remove("active");
-	void card.offsetWidth;
-	card.innerHTML = typeTag(q.type) + renderers[q.type](q) + helpBarHTML();
-	card.classList.add("active");
-
-	wirers[q.type](q);
-	wireSpeakButtons(q);
-	wireHelp(q);
-}
-
-function helpBarHTML() {
-	return `
-		<div class="help-bar">
-			<button class="help-btn" id="hint-btn"><i class="ph-bold ph-lightbulb"></i> Hint</button>
-			<button class="help-btn danger" id="reveal-btn"><i class="ph-bold ph-eye"></i> Show answer</button>
-		</div>`;
-}
-
-/* Escalating hints, then a full reveal so a student is never stuck. */
-function wireHelp(q) {
-	const hintBtn = document.getElementById("hint-btn");
-	const revealBtn = document.getElementById("reveal-btn");
-	if (hintBtn) hintBtn.addEventListener("click", () => giveHint(q));
-	if (revealBtn) revealBtn.addEventListener("click", () => revealAnswer(q));
-}
-
-function giveHint(q) {
-	if (locked) return;
-	const ans = (q.answer || q.word || "").toString();
-	hintLevel++;
-
-	if (q.type === "choice" || q.type === "homophone") {
-		const wrong = Array.from(card.querySelectorAll(".option"))
-			.filter(b => !b.disabled && norm(b.dataset.val) !== norm(q.answer));
-		if (wrong.length > 1) {
-			wrong[0].disabled = true;
-			wrong[0].style.opacity = "0.4";
-			wrong[0].style.textDecoration = "line-through";
-			showToast("Removed a wrong choice", "info", 1200);
-		} else {
-			setHint("Try saying each option aloud in the sentence — which one sounds right?");
-			showToast("Say it aloud", "info", 1200);
-		}
-		return;
-	}
-
-	if (hintLevel === 1) {
-		setHint(`This word has ${ans.length} letters and starts with “${ans[0].toUpperCase()}”.`);
-	} else if (hintLevel === 2) {
-		setHint(`It begins with “${ans[0].toUpperCase()}” and ends with “${ans[ans.length - 1].toUpperCase()}” — ${ans.length} letters in total.`);
-	} else {
-		setHint("Full spelling:  " + spellOut(ans) + ".   Use “Show answer” if you'd like to move on.");
-	}
-	showToast("Hint added to the sidebar", "info", 1100);
-}
-
-function revealAnswer(q) {
-	const ans = q.answer || q.word;
-
-	switch (q.type) {
-		case "dictation":
-		case "suffix":
-		case "plural":
-		case "correct": {
-			const inp = document.getElementById("answer");
-			inp.value = ans;
-			inp.disabled = true;
-			inp.classList.remove("field-wrong");
-			inp.classList.add("field-revealed");
-			const c = document.getElementById("check");
-			if (c) c.disabled = true;
-			break;
-		}
-		case "choice":
-		case "homophone": {
-			card.querySelectorAll(".option").forEach(b => {
-				b.disabled = true;
-				if (norm(b.dataset.val) === norm(q.answer)) b.classList.add("revealed");
-				else b.style.opacity = "0.5";
-			});
-			break;
-		}
-		case "missing": {
-			card.querySelectorAll(".letter-input").forEach(x => {
-				x.value = q.word[+x.dataset.i];
-				x.disabled = true;
-				x.classList.remove("field-wrong");
-				x.classList.add("field-revealed");
-			});
-			const c = document.getElementById("check");
-			if (c) c.disabled = true;
-			break;
-		}
-		case "unscramble": {
-			document.getElementById("slots").innerHTML =
-				q.word.split("").map(ch => `<span class="slot revealed">${ch}</span>`).join("");
-			card.querySelectorAll(".tile").forEach(t => t.classList.add("used"));
-			const cl = document.getElementById("clear");
-			if (cl) cl.disabled = true;
-			break;
-		}
-	}
-
-	revealedCount++;
-	setHint(`No problem — this word is spelled:  ${spellOut(ans)}.  Have a look, then continue.`);
-
-	const bar = card.querySelector(".help-bar");
-	if (bar) {
-		bar.innerHTML =
-			`<button class="btn" id="continue-btn"><i class="ph-bold ph-arrow-right"></i>&nbsp; Continue</button>
-			 <span class="mini-note" style="margin:0;">Answer shown — this one won't count toward your score.</span>`;
-		document.getElementById("continue-btn").addEventListener("click", () => {
-			if (locked) return;
-			locked = true;
-			qi++;
-			setTimeout(() => {
-				locked = false;
-				if (qi < QUESTIONS.length) loadQuestion();
-				else finish();
-			}, 150);
-		});
-	}
-}
-
-function wireSpeakButtons(q) {
-	card.querySelectorAll("[data-speak]").forEach(btn => {
-		btn.addEventListener("click", () => {
-			const phrase = btn.dataset.phrase || q.word || q.answer || "";
-			if (!Speech.supported()) {
-				showToast("Speech isn't available in this browser", "info", 1600);
-				return;
-			}
-			btn.classList.add("speaking");
-			Speech.say(phrase, {
-				rate: btn.dataset.slow ? 0.65 : 0.85,
-				onend: () => btn.classList.remove("speaking")
-			});
-		});
-	});
-}
-
-const renderers = {
-	dictation(q) {
-		return `
-			<p class="instruction">Listen to the word, then type it below.</p>
-			<div class="controls">
-				${speakBtnHTML("Hear the word")}
-				${speakBtnHTML("Slower", "small").replace('data-speak', 'data-speak data-slow="1"')}
-				<button class="speak-btn small" data-speak data-phrase="${q.sentence}">
-					<i class="ph-bold ph-chat-text"></i> In a sentence
-				</button>
-			</div>
-			<input type="text" id="answer" autocomplete="off" autocapitalize="off"
-				spellcheck="false" placeholder="Type the word you heard" style="margin-top:16px;">
-			<div class="controls" style="margin-top:14px;">
-				<button class="btn" id="check">Check</button>
-			</div>
-			<p class="mini-note">Tip: press the speaker as many times as you need.</p>`;
-	},
-
-	choice(q) {
-		const opts = q.options.map(o =>
-			`<button class="option" data-val="${o}">${o}</button>`).join("");
-		return `
-			<p class="instruction">${q.prompt}</p>
-			<div class="options">${opts}</div>`;
-	},
-
-	missing(q) {
-		const letters = q.word.split("").map((ch, i) => {
-			if (q.blanks.includes(i)) {
-				return `<input class="letter-input" maxlength="1" data-i="${i}"
-					autocomplete="off" autocapitalize="off" spellcheck="false">`;
-			}
-			return `<span class="fixed-letter">${ch}</span>`;
+			return `
+				<section class="tier">
+					<div class="tier-head">
+						<span class="tier-icon"><i class="ph-bold ${tier.icon}"></i></span>
+						<div>
+							<h2>${tier.name}</h2>
+							<p class="tier-blurb">${tier.blurb || ""}</p>
+						</div>
+						<span class="tier-badge">${tier.badge || ""}</span>
+					</div>
+					<div class="set-grid">${cards}</div>
+				</section>`;
 		}).join("");
-		return `
-			<p class="instruction">Fill in the missing letters to complete the word.</p>
-			<div class="controls" style="margin-bottom:6px;">${speakBtnHTML("Hear the word")}</div>
-			<div class="letter-row">${letters}</div>
-			<div class="controls">
-				<button class="btn" id="check">Check</button>
-			</div>`;
-	},
-
-	homophone(q) {
-		const opts = q.options.map(o =>
-			`<button class="option" data-val="${o}">${o}</button>`).join("");
-		return `
-			<p class="instruction">Choose the word that fits the sentence.</p>
-			<p class="sentence">${q.before}<span class="blank">?</span>${q.after}</p>
-			<div class="options cols-2">${opts}</div>`;
-	},
-
-	unscramble(q) {
-		const shuffled = shuffle(q.word.split(""));
-		const tiles = shuffled.map((ch, i) =>
-			`<button class="tile" data-letter="${ch}" data-tid="${i}">${ch}</button>`).join("");
-		return `
-			<p class="instruction">Put the letters in the right order to spell the word.</p>
-			<div class="controls" style="margin-bottom:8px;">${speakBtnHTML("Hear the word")}</div>
-			<div class="answer-slots" id="slots"></div>
-			<div class="tiles" id="tiles">${tiles}</div>
-			<div class="controls">
-				<button class="btn btn-ghost" id="clear"><i class="ph-bold ph-arrow-counter-clockwise"></i>&nbsp; Clear</button>
-			</div>`;
-	},
-
-	suffix(q) {
-		return `
-			<p class="instruction">Join the word and the ending together, spelled correctly.</p>
-			<p class="sentence"><strong>${q.base}</strong> &nbsp;+&nbsp; <strong>${q.suffix}</strong> &nbsp;=&nbsp; ?</p>
-			<input type="text" id="answer" autocomplete="off" autocapitalize="off"
-				spellcheck="false" placeholder="Type the whole word">
-			<div class="controls" style="margin-top:14px;">
-				<button class="btn" id="check">Check</button>
-			</div>`;
-	},
-
-	plural(q) {
-		return `
-			<p class="instruction">Write the <strong>plural</strong> (more than one) of this word.</p>
-			<p class="sentence">one <strong>${q.singular}</strong> &nbsp;→&nbsp; two <strong>?</strong></p>
-			<input type="text" id="answer" autocomplete="off" autocapitalize="off"
-				spellcheck="false" placeholder="Type the plural">
-			<div class="controls" style="margin-top:14px;">
-				<button class="btn" id="check">Check</button>
-			</div>`;
-	},
-
-	correct(q) {
-		return `
-			<p class="instruction">One word is spelled wrong. Type the correct spelling.</p>
-			<p class="sentence">${q.before}<span class="wrong-word">${q.wrong}</span>${q.after}</p>
-			<input type="text" id="answer" autocomplete="off" autocapitalize="off"
-				spellcheck="false" placeholder="Type the corrected word">
-			<div class="controls" style="margin-top:14px;">
-				<button class="btn" id="check">Check</button>
-			</div>`;
-	}
-};
-
-/* ---------- Wiring ---------- */
-
-function wireTextAnswer(getAnswer) {
-	const input = document.getElementById("answer");
-	const check = document.getElementById("check");
-	const run = () => {
-		if (locked) return;
-		if (norm(input.value) === norm(getAnswer())) {
-			input.classList.add("field-correct");
-			input.disabled = true;
-			handleCorrect();
-		} else {
-			handleWrong(input, QUESTIONS[qi]);
-		}
-	};
-	check.addEventListener("click", run);
-	input.addEventListener("keydown", e => { if (e.key === "Enter") run(); });
-	input.addEventListener("input", () => input.classList.remove("field-wrong"));
-	input.focus();
-}
-
-function wireOptions(correctVal) {
-	card.querySelectorAll(".option").forEach(btn => {
-		btn.addEventListener("click", () => {
-			if (locked || btn.disabled) return;
-			if (norm(btn.dataset.val) === norm(correctVal)) {
-				btn.classList.add("correct");
-				card.querySelectorAll(".option").forEach(b => b.disabled = true);
-				handleCorrect();
-			} else {
-				btn.classList.add("wrong");
-				btn.disabled = true;
-				handleWrong(null, QUESTIONS[qi]);
-			}
-		});
-	});
-}
-
-const wirers = {
-	dictation(q) { wireTextAnswer(() => q.word); },
-	suffix(q) { wireTextAnswer(() => q.answer); },
-	plural(q) { wireTextAnswer(() => q.answer); },
-	correct(q) { wireTextAnswer(() => q.answer); },
-	choice(q) { wireOptions(q.answer); },
-	homophone(q) { wireOptions(q.answer); },
-
-	missing(q) {
-		const inputs = Array.from(card.querySelectorAll(".letter-input"));
-		inputs.forEach((inp, idx) => {
-			inp.addEventListener("input", () => {
-				inp.value = inp.value.toLowerCase();
-				card.querySelectorAll(".letter-input").forEach(x => x.classList.remove("field-wrong"));
-				if (inp.value && inputs[idx + 1]) inputs[idx + 1].focus();
-			});
-			inp.addEventListener("keydown", e => {
-				if (e.key === "Backspace" && !inp.value && inputs[idx - 1]) inputs[idx - 1].focus();
-				if (e.key === "Enter") checkMissing(q, inputs);
-			});
-		});
-		document.getElementById("check").addEventListener("click", () => checkMissing(q, inputs));
-		if (inputs[0]) inputs[0].focus();
-	},
-
-	unscramble(q) {
-		const slots = document.getElementById("slots");
-		const placed = [];
-
-		const refresh = () => {
-			slots.innerHTML = placed.map((p, i) =>
-				`<span class="slot" data-pos="${i}">${p.letter}</span>`).join("");
-			slots.querySelectorAll(".slot").forEach(s => {
-				s.addEventListener("click", () => {
-					if (locked) return;
-					const pos = +s.dataset.pos;
-					const removed = placed.splice(pos, 1)[0];
-					if (removed) {
-						const tile = card.querySelector(`.tile[data-tid="${removed.tid}"]`);
-						if (tile) tile.classList.remove("used");
-					}
-					refresh();
-				});
-			});
-			if (placed.length === q.word.length) checkUnscramble(q, placed);
-		};
-
-		card.querySelectorAll(".tile").forEach(tile => {
-			tile.addEventListener("click", () => {
-				if (locked || tile.classList.contains("used")) return;
-				tile.classList.add("used");
-				placed.push({ letter: tile.dataset.letter, tid: tile.dataset.tid });
-				refresh();
-			});
-		});
-
-		document.getElementById("clear").addEventListener("click", () => {
-			if (locked) return;
-			placed.length = 0;
-			card.querySelectorAll(".tile").forEach(t => t.classList.remove("used"));
-			refresh();
-		});
-	}
-};
-
-function checkMissing(q, inputs) {
-	if (locked) return;
-	if (inputs.some(i => !i.value)) {
-		showToast("Fill in every box first", "info", 1400);
-		return;
-	}
-	const built = q.word.split("").map((ch, i) =>
-		q.blanks.includes(i) ? (inputs.find(x => +x.dataset.i === i).value) : ch).join("");
-	if (norm(built) === norm(q.word)) {
-		inputs.forEach(i => { i.classList.add("field-correct"); i.disabled = true; });
-		handleCorrect();
-	} else {
-		inputs.forEach(i => i.classList.add("field-wrong"));
-		handleWrong(null, q);
-	}
-}
-
-function checkUnscramble(q, placed) {
-	if (locked) return;
-	const built = placed.map(p => p.letter).join("");
-	if (norm(built) === norm(q.word)) {
-		card.querySelectorAll(".slot").forEach(s => {
-			s.style.background = "var(--success-soft)";
-			s.style.color = "var(--success)";
-		});
-		handleCorrect();
-	} else {
-		card.querySelectorAll(".slot").forEach(s => s.classList.add("field-wrong"));
-		handleWrong(null, q);
-		// clear after a beat so they can retry
-		setTimeout(() => {
-			if (locked) return;
-			placed.length = 0;
-			card.querySelectorAll(".tile").forEach(t => t.classList.remove("used"));
-			document.getElementById("slots").innerHTML = "";
-		}, 700);
-	}
-}
-
-function shuffle(arr) {
-	const a = arr.slice();
-	for (let i = a.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[a[i], a[j]] = [a[j], a[i]];
-	}
-	// avoid the (rare) already-solved order
-	if (a.join("") === arr.join("") && arr.length > 1) return shuffle(arr);
-	return a;
-}
-
-function finish() {
-	document.getElementById("progress-fill").style.width = "100%";
-	const hb = document.querySelector(".hint-box");
-	if (hb) hb.style.display = "none";
-	card.classList.remove("active");
-	card.style.display = "none";
-	document.getElementById("level-indicator").innerText = "Complete";
-	document.getElementById("final-score").innerText =
-		`Score: ${score} / ${QUESTIONS.length}` + (revealedCount ? `  ·  ${revealedCount} revealed` : "");
-	document.getElementById("success-screen").style.display = "block";
-}
-
-/* ---------- Start ---------- */
-loadQuestion();
+	})();
 </script>
 </body>
 </html>

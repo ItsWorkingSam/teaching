@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Spelling Practice</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+	<link rel="stylesheet" href="./css/training.css">
+
+	<style>
+		.q-type-tag {
+			display: inline-flex; align-items: center; gap: 6px;
+			font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+			text-transform: uppercase; color: var(--primary);
+			background: var(--primary-soft); padding: 5px 11px;
+			border-radius: 999px; margin-bottom: 14px;
+		}
+		.sentence { font-size: 1.15rem; line-height: 1.7; margin: 4px 0 16px; color: var(--text); }
+		.sentence .blank {
+			display: inline-block; min-width: 70px; border-bottom: 3px solid var(--primary);
+			text-align: center; font-weight: 700; color: var(--primary);
+		}
+		.wrong-word { text-decoration: underline wavy var(--error); text-underline-offset: 4px; font-weight: 700; }
+		.letter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 16px; }
+		.fixed-letter, .letter-input {
+			width: 46px; height: 54px; display: grid; place-items: center;
+			border-radius: var(--radius-sm); font-size: 1.5rem; font-weight: 700; text-transform: lowercase;
+		}
+		.fixed-letter { background: var(--card-2); border: 2px solid var(--border); color: var(--muted); }
+		.letter-input {
+			border: 2px solid var(--primary); background: var(--card); color: var(--text);
+			text-align: center; font-family: inherit; outline: none; padding: 0;
+			box-shadow: 0 0 0 4px var(--primary-soft);
+		}
+		.letter-input:focus { border-color: var(--primary-strong); }
+		.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+		.mini-note { font-size: 0.85rem; color: var(--muted); margin-top: 12px; }
+
+		.help-bar {
+			display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+			margin-top: 22px; padding-top: 16px; border-top: 1px dashed var(--border);
+		}
+		.help-btn {
+			display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px;
+			border-radius: 999px; border: 1px solid var(--border-strong); background: var(--card);
+			color: var(--text); font-weight: 600; font-size: 0.88rem; font-family: inherit; cursor: pointer;
+			transition: background 0.15s ease, border-color 0.15s ease;
+		}
+		.help-btn:hover { background: var(--card-2); border-color: var(--primary); }
+		.help-btn i { color: var(--primary); font-size: 1.05rem; }
+		.help-btn.danger:hover { border-color: var(--error); }
+		.help-btn.danger i { color: var(--error); }
+		.help-btn:disabled { opacity: 0.5; cursor: default; }
+		.field-revealed {
+			border-color: var(--primary) !important; background: var(--primary-soft) !important; color: var(--text) !important;
+		}
+		.option.revealed { border-color: var(--primary); background: var(--primary-soft); }
+		.slot.revealed { background: var(--primary-soft); color: var(--primary); }
+	</style>
+</head>
+<body>
+
+<div class="layout">
+	<div class="container">
+		<div class="app-bar">
+			<a class="brand" href="spelling.html">
+				<span class="brand-mark"><i class="ph-bold ph-pencil-simple"></i></span>
+				<span id="brand-label">Spelling</span>
+			</a>
+			<div class="header-actions">
+				<a class="icon-btn" href="spelling.html" aria-label="All spelling levels" title="All spelling levels"><i class="ph-bold ph-list"></i></a>
+				<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+			</div>
+		</div>
+
+		<header style="text-align:left;">
+			<h1 id="set-title">Spelling Practice</h1>
+			<p class="subtitle" id="set-subtitle">Listen, unscramble, fix and choose.</p>
+			<div class="progress-bar"><div id="progress-fill"></div></div>
+			<p id="level-indicator">Question 1</p>
+		</header>
+
+		<div id="status-display"></div>
+
+		<div id="quiz-card" class="step-card active"></div>
+
+		<div id="success-screen" style="display:none;">
+			<div class="success-emoji">🎉</div>
+			<h2>Great spelling!</h2>
+			<p>You worked through every activity.</p>
+			<div class="score-pill" id="final-score">Score: 0</div>
+			<div class="btn-row" style="justify-content:center;">
+				<button class="btn" onclick="location.reload()"><i class="ph-bold ph-arrow-clockwise"></i>&nbsp; Try Again</button>
+				<a class="btn btn-ghost" href="spelling.html"><i class="ph-bold ph-list"></i>&nbsp; More Levels</a>
+			</div>
+		</div>
+	</div>
+
+	<aside class="hint-box">
+		<span class="hint-title"><i class="ph-bold ph-lightbulb"></i> Helpful Hint</span>
+		<p id="hint-text"></p>
+	</aside>
+</div>
+
+<script src="./js/training-core.js"></script>
+<script src="./js/spelling-sets.js"></script>
+<script>
+	(function () {
+		const params = new URLSearchParams(location.search);
+		const key = params.get("set");
+		const set = window.SPELLING_SETS && window.SPELLING_SETS[key];
+		if (!set) {
+			// Unknown or missing set — send them to the picker.
+			location.replace("spelling.html");
+			return;
+		}
+		window.SPELLING_SET = set;
+	})();
+</script>
+<script src="./js/spelling.js"></script>
+</body>
+</html>

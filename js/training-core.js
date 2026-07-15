@@ -117,14 +117,14 @@ function showFeedback(message, type = "error") {
 /* Show a "Correct!" toast, then advance. Guarded against double-fire. */
 let _advancing = false;
 
-function flashCorrect(message = "Correct!", callback) {
+function flashCorrect(message = "Correct!", callback, delay = 850) {
 	if (_advancing) return;
 	_advancing = true;
-	showToast(message, "success", 900);
+	showToast(message, "success", Math.max(900, delay));
 	setTimeout(() => {
 		_advancing = false;
 		(callback || nextStep)();
-	}, 850);
+	}, delay);
 }
 
 /* ------------------------------------------------------------
