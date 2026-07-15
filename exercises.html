@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Practice Exercises</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+	<link rel="stylesheet" href="./css/training.css">
+
+	<style>
+		.hub { max-width: 720px; width: 100%; }
+
+		.exercise-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 16px;
+			margin-top: 8px;
+		}
+
+		.exercise-card {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			padding: 24px;
+			border-radius: var(--radius);
+			border: 1px solid var(--border);
+			background: var(--card);
+			box-shadow: var(--shadow-md);
+			text-decoration: none;
+			color: var(--text);
+			transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+		}
+
+		.exercise-card:hover {
+			transform: translateY(-3px);
+			box-shadow: var(--shadow-lg);
+			border-color: var(--primary);
+		}
+
+		.exercise-card .ex-icon {
+			display: grid;
+			place-items: center;
+			width: 52px;
+			height: 52px;
+			border-radius: 14px;
+			background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+			color: #fff;
+			font-size: 1.6rem;
+			box-shadow: var(--shadow-sm);
+		}
+
+		.exercise-card h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+		.exercise-card p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+
+		.exercise-card .go {
+			margin-top: 2px;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-weight: 700;
+			font-size: 0.9rem;
+			color: var(--primary);
+		}
+	</style>
+</head>
+<body>
+
+<main class="hub">
+	<div class="app-bar">
+		<a class="brand" href="index.html">
+			<span class="brand-mark"><i class="ph-bold ph-graduation-cap"></i></span>
+			Practice
+		</a>
+		<div class="header-actions">
+			<a class="icon-btn" href="index.html" aria-label="Home" title="Home"><i class="ph-bold ph-house"></i></a>
+			<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+		</div>
+	</div>
+
+	<header style="text-align:left; margin-bottom: 26px;">
+		<h1>Practice Exercises</h1>
+		<p class="subtitle">Short, hands-on activities for building everyday computer and literacy skills. Pick one to begin.</p>
+	</header>
+
+	<div class="exercise-grid">
+		<a class="exercise-card" href="mouse.html">
+			<span class="ex-icon"><i class="ph-bold ph-cursor-click"></i></span>
+			<h3>Mouse Skills</h3>
+			<p>Clicking, double-clicking, dragging, scrolling, hovering and right-click menus.</p>
+			<span class="go">Start <i class="ph-bold ph-arrow-right"></i></span>
+		</a>
+
+		<a class="exercise-card" href="copypaste.html">
+			<span class="ex-icon"><i class="ph-bold ph-clipboard"></i></span>
+			<h3>Copy &amp; Paste</h3>
+			<p>Copying text, links and images, keyboard shortcuts, and pasting into the right place.</p>
+			<span class="go">Start <i class="ph-bold ph-arrow-right"></i></span>
+		</a>
+
+		<a class="exercise-card" href="spelling.html">
+			<span class="ex-icon"><i class="ph-bold ph-pencil-simple"></i></span>
+			<h3>Spelling</h3>
+			<p>Listen and spell, unscramble, fix mistakes, homophones and tricky word endings.</p>
+			<span class="go">Start <i class="ph-bold ph-arrow-right"></i></span>
+		</a>
+	</div>
+</main>
+
+<script src="./js/training-core.js"></script>
+</body>
+</html>

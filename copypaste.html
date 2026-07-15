@@ -4,81 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Copy & Paste Practice</title>
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 	<link rel="stylesheet" href="./css/training.css">
-	<style>
-	.copy-source {
-		background: #f1f5f9;
-		border: 2px dashed #cbd5e1;
-		border-radius: 8px;
-		padding: 14px;
-		font-family: monospace;
-		user-select: text;
-	}
-	.source-area {
-		background: #f1f5f9;
-		border: 1px solid #cbd5e1;
-		padding: 15px;
-		margin: 15px 0;
-		border-radius: 6px;
-		position: relative;
-	}
-	
-	.paste-target {
-		width: 100%;
-		min-height: 100px;
-		border: 2px solid #cbd5e1;
-		border-radius: 8px;
-		padding: 12px;
-		font-size: 1rem;
-		resize: vertical;
-	}
-	.image-paste-zone {
-		width: 220px;
-		height: 160px;
-		border: 2px dashed #94a3b8;
-		border-radius: 10px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		background: #f8fafc;
-		color: #64748b;
-		font-size: 0.9rem;
-	}
-
-	.image-paste-zone img {
-		max-width: 100%;
-		max-height: 100%;
-		border-radius: 6px;
-	}
-	.copy-table {
-		border-collapse: collapse;
-		width: 100%;
-		margin-top: 10px;
-	}
-
-	.copy-table td,
-	.copy-table th {
-		border: 1px solid #cbd5e1;
-		padding: 8px;
-		text-align: left;
-	}
-
-	.copy-table th {
-		background: #e2e8f0;
-		font-weight: 600;
-	}
-
-</style>
 </head>
 <body>
 
 <div class="layout">
     <div class="container">
-        <header>
-            <h1>Copy & Paste Practice</h1>
+        <div class="app-bar">
+            <a class="brand" href="exercises.html">
+                <span class="brand-mark"><i class="ph-bold ph-clipboard"></i></span>
+                Copy &amp; Paste
+            </a>
+            <div class="header-actions">
+                <a class="icon-btn" href="index.html" aria-label="Home" title="Home"><i class="ph-bold ph-house"></i></a>
+                <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+            </div>
+        </div>
+
+        <header style="text-align:left;">
+            <h1>Copy &amp; Paste Practice</h1>
+            <p class="subtitle">Learn every way to copy and paste text, links, images and more.</p>
             <div class="progress-bar"><div id="progress-fill"></div></div>
-            <p id="level-indicator" style="font-weight: bold;">Activity 1 of 16</p>
+            <p id="level-indicator">Activity 1 of 16</p>
         </header>
 
         <div id="exercise-wrapper">
@@ -103,7 +51,7 @@
             <div id="ex13" class="step-card">
                 <p class="instruction">13. Many sites have a "Copy" button. Click it, then paste the code.</p>
                 <div class="source-area">
-                    <button class="copy-btn" onclick="copyValue('QUICK-COPY-77')">Copy</button>
+                    <button class="copy-btn" onclick="copyValue('QUICK-COPY-77', this)">Copy</button>
                     <span>QUICK-COPY-77</span>
                 </div>
                 <input type="text" id="in13" placeholder="Paste here...">
@@ -113,16 +61,21 @@
             <div id="ex15" class="step-card"><p class="instruction">15. Highlight the box to reveal text.</p><div class="source-area" style="background:white; color:white; border:1px solid #ccc;">GHOST-CODE</div><input type="text" id="in14"></div>
             <div id="ex16" class="step-card"><p class="instruction">16. Copy the price of the Diamond.</p><div class="source-area">Gold ($50), Diamond ($500)</div><input type="text" id="in15"></div>
 
-            <div id="success-screen" style="display:none; text-align:center;">
-                <h2 style="color: var(--success);">🎉 All Done!</h2>
+            <div id="success-screen" style="display:none;">
+                <div class="success-emoji">🎉</div>
+                <h2>All Done!</h2>
                 <p>You've practiced every major way to copy and paste.</p>
-                <button class="btn-reset" onclick="location.reload()">Start Over</button>
+                <div class="score-pill">16 / 16 activities complete</div>
+                <div class="btn-row" style="justify-content:center;">
+                    <button class="btn" onclick="location.reload()"><i class="ph-bold ph-arrow-clockwise"></i>&nbsp; Start Over</button>
+                    <a class="btn btn-ghost" href="exercises.html"><i class="ph-bold ph-squares-four"></i>&nbsp; More Exercises</a>
+                </div>
             </div>
         </div>
     </div>
 
     <aside class="hint-box">
-        <span class="hint-title">Helpful Hint</span>
+        <span class="hint-title"><i class="ph-bold ph-lightbulb"></i> Helpful Hint</span>
         <p id="hint-text">Click and drag your mouse over the text to turn it blue, then right-click to copy.</p>
     </aside>
 </div>
@@ -169,8 +122,19 @@
 
     function clean(str) { return str ? str.trim().toLowerCase().replace(/\/$/, "") : ""; }
 
-    function copyValue(val) {
+    const praise = ["Nice work!", "Correct!", "Perfect!", "That's it!", "Well done!", "Spot on!"];
+    function correct() {
+        flashCorrect(praise[Math.floor(TRAINING.currentStep) % praise.length]);
+    }
+
+    function copyValue(val, btn) {
         navigator.clipboard.writeText(val);
+        if (btn) {
+            const original = btn.innerText;
+            btn.classList.add('copied');
+            btn.innerText = 'Copied!';
+            setTimeout(() => { btn.classList.remove('copied'); btn.innerText = original; }, 1200);
+        }
     }
 
 
@@ -183,7 +147,7 @@
                         const reader = new FileReader();
                         reader.onload = (ev) => {
                             document.getElementById(step.inputId).innerHTML = `<img src="${ev.target.result}">`;
-                            setTimeout(nextStep, 600);
+                            correct();
                         };
                         reader.readAsDataURL(items[i].getAsFile());
                     }
@@ -191,11 +155,11 @@
             });
         } else if (step.type === 'dual') {
             const a = document.getElementById('in11a'), b = document.getElementById('in11b');
-            const check = () => { if(clean(a.value) === 'done' && clean(b.value) === 'done') nextStep(); };
+            const check = () => { if(clean(a.value) === 'done' && clean(b.value) === 'done') correct(); };
             a.addEventListener('input', check); b.addEventListener('input', check);
         } else {
             document.getElementById(step.inputId).addEventListener('input', (e) => {
-                if (clean(e.target.value) === clean(step.target)) nextStep();
+                if (clean(e.target.value) === clean(step.target)) correct();
             });
         }
     });
