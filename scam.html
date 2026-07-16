@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Spot the Scam</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+	<link rel="stylesheet" href="./css/training.css">
+
+	<style>
+		.ask { font-weight: 700; font-size: 1.1rem; margin: 20px 0 12px; }
+
+		/* Message cards */
+		.msg { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); margin-bottom: 4px; }
+		.msg-head {
+			display: flex; align-items: center; gap: 7px;
+			font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+			color: var(--muted); background: var(--card-2); padding: 8px 14px; border-bottom: 1px solid var(--border);
+		}
+		.msg-head i { color: var(--primary); font-size: 1rem; }
+		.msg-from { padding: 12px 14px 0; font-size: 0.9rem; color: var(--muted); }
+
+		.sms-bubble {
+			margin: 10px 14px 16px; padding: 13px 15px;
+			background: var(--card-2); border-radius: 4px 16px 16px 16px;
+			font-size: 1.02rem; line-height: 1.55; border: 1px solid var(--border);
+		}
+
+		.email-head { padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--card); }
+		.email-row { font-size: 0.92rem; margin: 2px 0; display: flex; gap: 8px; }
+		.email-row .lbl { color: var(--muted); min-width: 58px; font-weight: 600; }
+		.email-addr { font-family: "Courier New", monospace; }
+		.email-body { padding: 15px 14px; font-size: 1.02rem; line-height: 1.6; }
+
+		.msg-popup { border: 2px solid var(--error); }
+		.popup-bar { background: var(--error); color: #fff; font-weight: 700; padding: 9px 14px; font-size: 0.95rem; }
+		.popup-body { padding: 16px 14px; text-align: center; }
+		.popup-body p { color: var(--text); font-size: 1rem; line-height: 1.6; margin: 0 0 14px; }
+		.popup-btn {
+			display: inline-block; background: var(--error); color: #fff; font-weight: 700;
+			padding: 9px 20px; border-radius: 8px; font-size: 0.95rem;
+		}
+
+		.call-lines { padding: 8px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+		.call-line {
+			background: var(--card-2); border: 1px solid var(--border); border-radius: 14px;
+			padding: 11px 14px; font-size: 1rem; line-height: 1.5; font-style: italic;
+		}
+
+		/* A "web address" inside a message: draw the eye, but not tappable */
+		.url {
+			font-family: "Courier New", monospace; font-weight: 700;
+			color: var(--primary); word-break: break-all;
+			background: var(--primary-soft); padding: 0 4px; border-radius: 4px;
+		}
+		.msg-popup .url, .popup-body .url { color: var(--error); background: var(--error-soft); }
+
+		/* Judge buttons */
+		.judge-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		.judge-btn {
+			display: flex; align-items: center; justify-content: center; gap: 9px;
+			padding: 16px; border-radius: var(--radius-sm); border: 2px solid var(--border-strong);
+			background: var(--card); color: var(--text); font-weight: 700; font-size: 1rem;
+			font-family: inherit; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s;
+		}
+		.judge-btn i { font-size: 1.3rem; }
+		.judge-btn.scam:hover { border-color: var(--error); background: var(--error-soft); }
+		.judge-btn.safe:hover { border-color: var(--success); background: var(--success-soft); }
+		.judge-btn:active { transform: scale(0.99); }
+		.judge-btn:disabled { cursor: default; }
+		.judge-btn.is-correct { border-color: var(--success); background: var(--success-soft); }
+		.judge-btn.is-wrong { border-color: var(--error); background: var(--error-soft); }
+
+		/* Reveal */
+		.reveal-slot:empty { display: none; }
+		.reveal {
+			margin-top: 18px; padding: 16px 18px; border-radius: var(--radius-sm);
+			border: 1px solid var(--border); animation: cardIn 0.3s ease;
+		}
+		.reveal.scam { border-color: var(--error); background: var(--error-soft); }
+		.reveal.safe { border-color: var(--success); background: var(--success-soft); }
+		.reveal.info { border-color: var(--border-strong); background: var(--card-2); }
+		.verdict { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem; margin-bottom: 10px; }
+		.reveal.scam .verdict { color: var(--error); }
+		.reveal.safe .verdict { color: var(--success); }
+		.reveal-sub { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+		.flag-list { margin: 0 0 14px; padding-left: 20px; }
+		.flag-list li { margin: 6px 0; line-height: 1.5; }
+		.safe-action {
+			display: flex; gap: 9px; align-items: flex-start;
+			background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+			padding: 12px 14px; line-height: 1.5; margin-bottom: 16px;
+		}
+		.safe-action i { color: var(--primary); font-size: 1.2rem; margin-top: 1px; flex-shrink: 0; }
+		.reveal-note { display: flex; gap: 9px; align-items: flex-start; line-height: 1.55; margin: 0 0 14px; }
+		.reveal-note i { color: var(--success); font-size: 1.2rem; margin-top: 1px; flex-shrink: 0; }
+		.reveal.info .reveal-note { margin-bottom: 0; }
+		.continue-btn { width: 100%; justify-content: center; }
+
+		/* Safety checklist sidebar */
+		.check-box {
+			width: 240px; background: var(--card); border: 1px solid var(--border);
+			border-radius: var(--radius); padding: 18px; position: sticky; top: 20px;
+			box-shadow: var(--shadow-sm);
+		}
+		.check-box h3 { margin: 0 0 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 7px; }
+		.check-box h3 i { color: var(--primary); }
+		.check-box ul { list-style: none; margin: 0; padding: 0; }
+		.check-box li { display: flex; gap: 9px; align-items: flex-start; font-size: 0.85rem; line-height: 1.45; color: var(--muted); margin-bottom: 11px; }
+		.check-box li i { color: var(--success); font-size: 1.05rem; margin-top: 1px; flex-shrink: 0; }
+
+		#success-screen .rules {
+			text-align: left; max-width: 440px; margin: 18px auto 0;
+			background: var(--card-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px;
+		}
+		#success-screen .rules li { margin: 8px 0; line-height: 1.5; }
+
+		@media (max-width: 820px) {
+			.check-box { width: auto; position: static; order: 2; }
+			.judge-btns { grid-template-columns: 1fr; }
+		}
+	</style>
+</head>
+<body>
+
+<div class="layout">
+	<div class="container">
+		<div class="app-bar">
+			<a class="brand" href="exercises.html">
+				<span class="brand-mark"><i class="ph-bold ph-shield-warning"></i></span>
+				Spot the Scam
+			</a>
+			<div class="header-actions">
+				<a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four"></i></a>
+				<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+			</div>
+		</div>
+
+		<header style="text-align:left;">
+			<h1>Spot the Scam</h1>
+			<p class="subtitle">Real scam messages look convincing. Decide whether each one is a scam or genuine, and learn the tell-tale signs.</p>
+			<div class="progress-bar"><div id="progress-fill"></div></div>
+			<p id="level-indicator">Message 1</p>
+		</header>
+
+		<div id="scenario-card" class="step-card active"></div>
+
+		<div id="success-screen" style="display:none;">
+			<div class="success-emoji">🛡️</div>
+			<h2>Nicely done</h2>
+			<p id="final-note"></p>
+			<div class="score-pill" id="final-score">Score</div>
+
+			<ul class="rules">
+				<li><strong>Slow down.</strong> Urgency and threats are a scammer's favourite trick.</li>
+				<li><strong>Check the sender and any web address.</strong> A name can be faked; the address is harder to fake.</li>
+				<li><strong>Never share passwords or one-time codes,</strong> even if someone says they're from your bank.</li>
+				<li><strong>Don't tap links in unexpected messages.</strong> Go to the app or website yourself.</li>
+				<li><strong>When in doubt, check directly</strong> using a number or website you find yourself.</li>
+			</ul>
+
+			<div class="btn-row" style="justify-content:center;">
+				<button class="btn" onclick="location.reload()"><i class="ph-bold ph-arrow-clockwise"></i>&nbsp; Try Again</button>
+				<a class="btn btn-ghost" href="exercises.html"><i class="ph-bold ph-squares-four"></i>&nbsp; More Exercises</a>
+			</div>
+		</div>
+	</div>
+
+	<aside class="check-box">
+		<h3><i class="ph-bold ph-magnifying-glass"></i> How to check anything</h3>
+		<ul>
+			<li><i class="ph-bold ph-check"></i> Were you expecting this message?</li>
+			<li><i class="ph-bold ph-check"></i> Does the sender or web address look right?</li>
+			<li><i class="ph-bold ph-check"></i> Is it rushing you or making threats?</li>
+			<li><i class="ph-bold ph-check"></i> Is it asking for money, passwords or codes?</li>
+			<li><i class="ph-bold ph-check"></i> Can you check with the company directly instead?</li>
+		</ul>
+	</aside>
+</div>
+
+<script src="./js/training-core.js"></script>
+<script src="./js/scam-scenarios.js"></script>
+<script src="./js/scam.js"></script>
+</body>
+</html>
