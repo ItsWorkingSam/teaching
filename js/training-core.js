@@ -133,15 +133,32 @@ function flashCorrect(message = "Correct!", callback, delay = 850) {
 
 const THEME_KEY = "theme-preference";
 
+/* localStorage throws in some privacy modes and when site data is blocked.
+   Every page loads this file first, so one throw here would break them all. */
+const Store = {
+	get(key) {
+		try { return localStorage.getItem(key); } catch (e) { return null; }
+	},
+	set(key, value) {
+		try { localStorage.setItem(key, value); } catch (e) { /* not saved, still works */ }
+	},
+	getJSON(key, fallback) {
+		try { return JSON.parse(this.get(key)) || fallback; } catch (e) { return fallback; }
+	},
+	setJSON(key, value) {
+		this.set(key, JSON.stringify(value));
+	}
+};
+
 function getThemePreference() {
-	const saved = localStorage.getItem(THEME_KEY);
+	const saved = Store.get(THEME_KEY);
 	if (saved) return saved;
 	return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 function applyTheme(theme) {
 	document.documentElement.setAttribute("data-theme", theme);
-	localStorage.setItem(THEME_KEY, theme);
+	Store.set(THEME_KEY, theme);
 	const icon = document.querySelector("#theme-toggle i");
 	if (icon) {
 		icon.className = theme === "dark" ? "ph-bold ph-sun" : "ph-bold ph-moon";
@@ -169,15 +186,21 @@ document.addEventListener("DOMContentLoaded", initTheme);
 
 const Speech = {
 	voice: null,
+	_current: null,
 
 	pickVoice() {
 		const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
 		if (!voices.length) return null;
-		// Prefer a natural English voice; NZ/GB/AU/US in that order.
+		// NZ/GB/AU/US English in that order. Within each, prefer the
+		// higher-quality "Natural"/"Online"/Google voices over the robotic
+		// built-in ones (Edge and Chrome both ship these).
 		const order = ["en-NZ", "en-GB", "en-AU", "en-US", "en"];
+		const quality = v => /natural|online|neural|google|premium|enhanced/i.test(v.name) ? 0 : 1;
 		for (const pref of order) {
-			const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(pref.toLowerCase()));
-			if (v) return v;
+			const matches = voices
+				.filter(v => v.lang && v.lang.replace("_", "-").toLowerCase().startsWith(pref.toLowerCase()))
+				.sort((a, b) => quality(a) - quality(b));
+			if (matches.length) return matches[0];
 		}
 		return voices[0];
 	},
@@ -196,7 +219,16 @@ const Speech = {
 		u.rate = opts.rate != null ? opts.rate : 0.9;
 		u.pitch = opts.pitch != null ? opts.pitch : 1;
 		if (opts.onstart) u.onstart = opts.onstart;
-		if (opts.onend) u.onend = opts.onend;
+		// Chrome can drop onend if the utterance is garbage collected, and
+		// skips it entirely when cancelled, so hold a reference and treat
+		// errors as an end too.
+		if (opts.onend) {
+			let done = false;
+			const end = () => { if (!done) { done = true; opts.onend(); } };
+			u.onend = end;
+			u.onerror = end;
+		}
+		this._current = u;
 		window.speechSynthesis.speak(u);
 		return true;
 	}

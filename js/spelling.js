@@ -198,14 +198,12 @@ function revealAnswer(q) {
 			break;
 		}
 		case "missing": {
-			const pattern = getPattern(q);
 			card.querySelectorAll(".letter-input").forEach(x => {
 				x.value = q.word[+x.dataset.i];
 				x.disabled = true;
 				x.classList.remove("field-wrong");
 				x.classList.add("field-revealed");
 			});
-			void pattern;
 			const c = document.getElementById("check");
 			if (c) c.disabled = true;
 			break;
@@ -265,7 +263,7 @@ const renderers = {
 			<div class="controls">
 				${speakBtnHTML("Hear the word")}
 				${speakBtnHTML("Slower", "small").replace('data-speak', 'data-speak data-slow="1"')}
-				<button class="speak-btn small" data-speak data-phrase="${q.sentence}">
+				<button class="speak-btn small" data-speak data-phrase="${(q.sentence || "").replace(/"/g, "&quot;")}">
 					<i class="ph-bold ph-chat-text"></i> In a sentence
 				</button>
 			</div>
@@ -508,7 +506,9 @@ function shuffle(arr) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[a[i], a[j]] = [a[j], a[i]];
 	}
-	if (a.join("") === arr.join("") && arr.length > 1) return shuffle(arr);
+	// Reshuffle if it came out in order, unless every letter is the same
+	// (then no order is different and this would recurse forever).
+	if (a.join("") === arr.join("") && new Set(arr).size > 1) return shuffle(arr);
 	return a;
 }
 

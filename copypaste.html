@@ -154,7 +154,10 @@
     }
 
     function copyValue(val, btn) {
-        navigator.clipboard.writeText(val);
+        // Clipboard access is refused on file:// and in some browsers.
+        if (!navigator.clipboard) { showToast("Copying isn't allowed here. Select the text and press Ctrl + C instead.", "info", 2600); return; }
+        navigator.clipboard.writeText(val).catch(() =>
+            showToast("Copying isn't allowed here. Select the text and press Ctrl + C instead.", "info", 2600));
         if (btn) {
             const original = btn.innerText;
             btn.classList.add('copied');
