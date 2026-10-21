@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Number Bee</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+	<link rel="stylesheet" href="./css/training.css">
+	<link rel="stylesheet" href="./css/game.css">
+</head>
+<body>
+
+<div class="layout">
+	<div class="container">
+		<div class="app-bar">
+			<a class="brand" href="exercises.html">
+				<span class="brand-mark"><i class="ph-bold ph-calculator"></i></span>
+				Number Bee
+			</a>
+			<div class="header-actions">
+				<a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four"></i></a>
+				<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+			</div>
+		</div>
+
+		<header style="text-align:left;">
+			<h1>Number Bee</h1>
+			<p class="subtitle">Mental maths that gets harder as you go, from adding to 20 up to percentages and GST.</p>
+		</header>
+
+		<div id="game"></div>
+	</div>
+
+	<aside class="hint-box">
+		<span class="hint-title"><i class="ph-bold ph-lightbulb"></i> How it works</span>
+		<ul>
+			<li>Work it out in your head, or on paper if you like.</li>
+			<li>Type just the number. You can leave out $, % and commas.</li>
+			<li>Get 5 right to move up a level.</li>
+			<li>Miss one and you'll see a quick way to work it out.</li>
+		</ul>
+		<div class="records" id="records"></div>
+	</aside>
+</div>
+
+<script src="./js/training-core.js"></script>
+<script src="./js/game-engine.js"></script>
+<script src="./js/numeracy.js"></script>
+<script src="./js/numberbee.js"></script>
+</body>
+</html>

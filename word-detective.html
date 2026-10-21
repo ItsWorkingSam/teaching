@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Word Detective</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+	<link rel="stylesheet" href="./css/training.css">
+	<link rel="stylesheet" href="./css/game.css">
+</head>
+<body>
+
+<div class="layout">
+	<div class="container">
+		<div class="app-bar">
+			<a class="brand" href="exercises.html">
+				<span class="brand-mark"><i class="ph-bold ph-magnifying-glass"></i></span>
+				Word Detective
+			</a>
+			<div class="header-actions">
+				<a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four"></i></a>
+				<button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
+			</div>
+		</div>
+
+		<header style="text-align:left;">
+			<h1>Word Detective</h1>
+			<p class="subtitle">Find the mistakes in everyday writing: capital letters, sound-alike words, apostrophes, verbs and punctuation.</p>
+		</header>
+
+		<div id="game"></div>
+	</div>
+
+	<aside class="hint-box">
+		<span class="hint-title"><i class="ph-bold ph-lightbulb"></i> How it works</span>
+		<ul>
+			<li>Each sentence has <strong>one</strong> mistake to find, or one gap to fill.</li>
+			<li>Press <strong>Read it</strong> to hear the sentence.</li>
+			<li>After each answer you'll see why, so take a moment to read it.</li>
+			<li>Get 5 right to move up a level.</li>
+		</ul>
+		<div class="records" id="records"></div>
+	</aside>
+</div>
+
+<script src="./js/training-core.js"></script>
+<script src="./js/game-engine.js"></script>
+<script src="./js/word-detective-data.js"></script>
+<script src="./js/word-detective.js"></script>
+</body>
+</html>
