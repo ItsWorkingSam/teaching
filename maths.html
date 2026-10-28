@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Maths</title>
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+    <link rel="stylesheet" href="./css/training.css">
+    <link rel="stylesheet" href="./css/hub.css">
+    <link rel="stylesheet" href="./css/maths.css">
+</head>
+<body class="maths-page">
+<main class="hub">
+    <div class="app-bar">
+        <a class="brand" href="exercises.html"><span class="brand-mark"><i class="ph-bold ph-graduation-cap" aria-hidden="true"></i></span> Practice</a>
+        <div class="header-actions">
+            <a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four" aria-hidden="true"></i></a>
+            <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon" aria-hidden="true"></i></button>
+        </div>
+    </div>
+    <header class="maths-header">
+        <h1>Visual Maths</h1>
+        <p class="subtitle">Build confidence with clocks, fractions and diagrams. Choose an activity, then start at a level that feels right for you.</p>
+    </header>
+    <div class="source-area">Start with the basics or try something harder. There is no timer. Each answer comes with an explanation, and Practice keeps you at your chosen level for as long as you like. Choose Level up when you want to progress.</div>
+    <div class="exercise-grid" id="maths-topics"></div>
+    <noscript><p>These interactive activities need JavaScript enabled in your browser.</p></noscript>
+    <p class="subtitle" style="margin-top:24px;">More number practice: <a class="maths-back" href="numberbee.html">Number Bee</a> · <a class="maths-back" href="money.html">Money &amp; Shopping</a></p>
+</main>
+<script src="./js/training-core.js"></script>
+<script src="./js/game-engine.js"></script>
+<script src="./js/maths-diagrams.js"></script>
+<script src="./js/maths-topics.js"></script>
+<script src="./js/maths.js"></script>
+</body>
+</html>

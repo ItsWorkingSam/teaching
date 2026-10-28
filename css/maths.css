@@ -1,0 +1,34 @@
+.maths-header { text-align: left; }
+.maths-back { display: inline-block; color: var(--primary); margin-bottom: 18px; font-weight: 600; }
+.maths-visual { background: var(--card-2); border: 1px solid var(--border); border-radius: var(--radius); margin: 12px 0 18px; padding: 12px; text-align: center; }
+.maths-diagram { display: block; width: 100%; max-width: 370px; height: auto; margin: auto; overflow: visible; }
+.maths-diagram text { fill: var(--text); font-family: inherit; font-size: 17px; font-weight: 600; text-anchor: middle; dominant-baseline: middle; stroke: none; }
+.maths-diagram .small-label { font-size: 12px; }
+.maths-diagram line, .maths-diagram .guide { stroke: var(--text); stroke-width: 2; fill: none; }
+.maths-diagram .minor { stroke: var(--muted); stroke-width: 1; }
+.maths-diagram .face { fill: var(--card); stroke: var(--text); stroke-width: 2; }
+.maths-diagram .hour-hand { stroke: var(--text); stroke-width: 8; stroke-linecap: round; }
+.maths-diagram .minute-hand { stroke: var(--primary); stroke-width: 4; stroke-linecap: round; }
+.maths-diagram .dot { fill: var(--text); }
+.maths-diagram .angle-arc { stroke: var(--primary); stroke-width: 3; fill: none; }
+.maths-diagram .crust { fill: #c97b37; }
+.maths-diagram .pizza-filled { fill: #f4c76b; stroke: #704521; stroke-width: 2; }
+.maths-diagram .pizza-empty { fill: var(--card); stroke: #704521; stroke-width: 2; }
+.maths-diagram .topping { fill: #a63825; }
+.maths-caption { color: var(--muted); margin: 8px 0 0; font-size: .88rem; }
+.maths-help { margin: 14px 0; line-height: 1.6; }
+.maths-help summary { color: var(--primary); cursor: pointer; font-weight: 600; }
+.maths-help p { margin: 8px 0; }
+.maths-page :focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.maths-page .answer-field { min-width: 0; }
+.maths-page .answer-row input { min-width: 0; }
+@media (max-width: 480px) {
+    .maths-page .game-card { padding: 18px; }
+    .maths-page .answer-row { flex-direction: column; }
+    .maths-page .mode-row { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .maths-page *, .maths-page *::before, .maths-page *::after { animation: none !important; transition: none !important; }
+}
+
+#topic-hint { color: var(--hint-text); line-height: 1.55; }

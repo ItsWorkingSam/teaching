@@ -12,6 +12,7 @@
      noun: ["question", "questions"],
      levels: [{ name, blurb }, ...],
      needsSpeech: false,             // warn if text-to-speech is missing
+     fixedPractice: false,           // maths: stay at chosen level; add Level up mode
      remember: false,                // skip questions answered right before
      tip: "Press Enter to check.",   // small note under each question
 
@@ -138,9 +139,12 @@ const LevelGame = {
 			Store.getJSON(cfg.storageKey, {}));
 		const mastered = new Set(stats.mastered);
 		let chosenLevel = Math.min(Math.max(stats.lastLevel, 1), top);
-		let chosenMode = stats.lastMode === "challenge" ? "challenge" : "practice";
+		let chosenMode = ["practice", "challenge", ...(cfg.fixedPractice ? ["levelup"] : [])].includes(stats.lastMode)
+			? stats.lastMode : "practice";
 		let game = null;
 		let seq = 0;          // bumps per question, so stale callbacks do nothing
+
+		const isFixedPractice = () => cfg.fixedPractice && game.mode === "practice";
 
 		const prepare = n => cfg.prepare ? Promise.resolve(cfg.prepare(n)) : Promise.resolve();
 
@@ -156,14 +160,18 @@ const LevelGame = {
 				<p class="section-label">1. Choose a starting level</p>
 				<div class="level-grid"></div>
 				<p class="section-label">2. Choose how to play</p>
-				<div class="mode-row">
+				<div class="mode-row${cfg.fixedPractice ? " mode-row-three" : ""}">
 					<button type="button" class="level-btn" data-mode="practice">
 						<span class="lvl-name"><i class="ph-bold ph-leaf"></i> Practice</span>
-						<span class="lvl-eg">No limit. Keep going as long as you like.</span>
+						<span class="lvl-eg">${cfg.fixedPractice ? "Stay at your chosen level. Unlimited questions, no lives or timer." : "No limit. Keep going as long as you like."}</span>
 					</button>
+					${cfg.fixedPractice ? `<button type="button" class="level-btn" data-mode="levelup">
+						<span class="lvl-name"><i class="ph-bold ph-trend-up"></i> Level up</span>
+						<span class="lvl-eg">Move up after 5 correct answers. Unlimited attempts.</span>
+					</button>` : ""}
 					<button type="button" class="level-btn" data-mode="challenge">
 						<span class="lvl-name"><i class="ph-bold ph-heart"></i> Challenge</span>
-						<span class="lvl-eg">Three lives. How far can you get?</span>
+						<span class="lvl-eg">${cfg.fixedPractice ? "Move up after 5 correct answers. Three lives." : "Three lives. How far can you get?"}</span>
 					</button>
 				</div>
 				<div class="game-warning" hidden></div>
@@ -297,7 +305,7 @@ const LevelGame = {
 		async function ensureLevel() {
 			try {
 				await prepare(game.level);
-				if (game.level < top) prepare(game.level + 1).catch(() => {});
+				if (!isFixedPractice() && game.level < top) prepare(game.level + 1).catch(() => {});
 				return true;
 			} catch (e) {
 				ref("area").innerHTML = `<p class="loading">Sorry, this level couldn't be loaded. Check your connection and refresh the page.</p>`;
@@ -308,7 +316,8 @@ const LevelGame = {
 		function renderTop() {
 			ref("level").textContent = `Level ${game.level} · ${levels[game.level - 1].name}`;
 			const filled = game.level === top ? E.TO_LEVEL_UP : game.inLevel;
-			ref("dots").innerHTML = Array.from({ length: E.TO_LEVEL_UP }, (_, i) =>
+			ref("dots").title = isFixedPractice() ? "Staying at your chosen level" : "Progress to the next level";
+			ref("dots").innerHTML = isFixedPractice() ? "" : Array.from({ length: E.TO_LEVEL_UP }, (_, i) =>
 				`<span class="${i < filled ? "on" : ""}"></span>`).join("");
 			const lives = ref("lives");
 			lives.innerHTML = game.mode === "challenge"
@@ -326,7 +335,7 @@ const LevelGame = {
 				const r = game.review.splice(due, 1)[0];
 				return { q: r.q, review: true, tries: r.tries };
 			}
-			const step = Math.min(game.inLevel, E.TO_LEVEL_UP - 1);
+			const step = isFixedPractice() ? game.inLevel % E.TO_LEVEL_UP : Math.min(game.inLevel, E.TO_LEVEL_UP - 1);
 			const q = cfg.next(game.level, step, { used: game.used, mastered });
 			return { q, review: false, tries: 0 };
 		}
@@ -383,7 +392,7 @@ const LevelGame = {
 			let levelledUp = false;
 			if (!review) {
 				game.inLevel++;
-				if (game.inLevel >= E.TO_LEVEL_UP && game.level < top) {
+				if (!isFixedPractice() && game.inLevel >= E.TO_LEVEL_UP && game.level < top) {
 					game.level++;
 					game.inLevel = 0;
 					levelledUp = true;
@@ -428,7 +437,7 @@ const LevelGame = {
 				status = game.lives > 0
 					? `${game.lives} ${game.lives === 1 ? "life" : "lives"} left.`
 					: "That was your last life.";
-			} else if (game.missStreak >= E.MISSES_TO_DROP && game.level > 1) {
+			} else if (!isFixedPractice() && game.missStreak >= E.MISSES_TO_DROP && game.level > 1) {
 				game.level--;
 				game.inLevel = 0;
 				game.missStreak = 0;

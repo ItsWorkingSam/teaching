@@ -147,6 +147,7 @@
 	];
 
 	LevelGame.create({
+		fixedPractice: true,
 		mount: "game",
 		recordsEl: "records",
 		storageKey: "number-bee-v1",

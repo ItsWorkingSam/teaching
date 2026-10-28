@@ -8,61 +8,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 	<link rel="stylesheet" href="./css/training.css">
 
-	<style>
-		.hub { max-width: 720px; width: 100%; }
-
-		.exercise-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-			gap: 16px;
-			margin-top: 8px;
-		}
-
-		.exercise-card {
-			display: flex;
-			flex-direction: column;
-			gap: 12px;
-			padding: 24px;
-			border-radius: var(--radius);
-			border: 1px solid var(--border);
-			background: var(--card);
-			box-shadow: var(--shadow-md);
-			text-decoration: none;
-			color: var(--text);
-			transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-		}
-
-		.exercise-card:hover {
-			transform: translateY(-3px);
-			box-shadow: var(--shadow-lg);
-			border-color: var(--primary);
-		}
-
-		.exercise-card .ex-icon {
-			display: grid;
-			place-items: center;
-			width: 52px;
-			height: 52px;
-			border-radius: 14px;
-			background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-			color: #fff;
-			font-size: 1.6rem;
-			box-shadow: var(--shadow-sm);
-		}
-
-		.exercise-card h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
-		.exercise-card p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
-
-		.exercise-card .go {
-			margin-top: 2px;
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			font-weight: 700;
-			font-size: 0.9rem;
-			color: var(--primary);
-		}
-	</style>
+	<link rel="stylesheet" href="./css/hub.css">
 </head>
 <body>
 
@@ -79,7 +25,7 @@
 
 	<header style="text-align:left; margin-bottom: 26px;">
 		<h1>Practice Exercises</h1>
-		<p class="subtitle">Short, hands-on activities for building everyday computer and literacy skills. Pick one to begin.</p>
+		<p class="subtitle">Short, hands-on activities for building everyday computer, literacy and maths skills. Pick one to begin.</p>
 	</header>
 
 	<div class="exercise-grid">
@@ -116,6 +62,13 @@
 			<h3>Word Detective</h3>
 			<p>Spot the mistake: capital letters, there/their/they're, apostrophes, verbs and punctuation.</p>
 			<span class="go">Play <i class="ph-bold ph-arrow-right"></i></span>
+		</a>
+
+		<a class="exercise-card" href="maths.html">
+			<span class="ex-icon"><i class="ph-bold ph-shapes" aria-hidden="true"></i></span>
+			<h3>Visual Maths</h3>
+			<p>Read clocks, explore pizza fractions, angles, number lines and shape measurements. Start with the basics and build up.</p>
+			<span class="go">Choose an activity <i class="ph-bold ph-arrow-right"></i></span>
 		</a>
 
 		<a class="exercise-card" href="numberbee.html">

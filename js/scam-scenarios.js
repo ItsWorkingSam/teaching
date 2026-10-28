@@ -181,7 +181,7 @@ window.SCAM_SCENARIOS = [
 			fromName: "Netflix",
 			fromAddress: "billing@netflix-account-update.com",
 			subject: "Your membership is on hold",
-			body: "We're having trouble with your current billing information. Update your payment details within 48 hours to keep your account active. Update payment."
+			body: "We're having trouble with your current billing information. Update your payment details within 48 hours to keep your account active. Update payment: https://netflix-account-update.invalid/payment"
 		},
 		flags: [
 			"The sender address is netflix-account-update.com, not netflix.com.",

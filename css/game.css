@@ -234,3 +234,9 @@
 	.compare { grid-template-columns: 1fr; }
 	.question-big { font-size: 1.8rem; }
 }
+
+/* Maths offers fixed-level practice alongside progression and challenge. */
+.mode-row-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 600px) {
+	.mode-row-three { grid-template-columns: 1fr; }
+}

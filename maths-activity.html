@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Maths Activity</title>
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+    <link rel="stylesheet" href="./css/training.css">
+    <link rel="stylesheet" href="./css/game.css">
+    <link rel="stylesheet" href="./css/maths.css">
+</head>
+<body class="maths-page">
+<div class="layout">
+    <main class="container">
+        <div class="app-bar">
+            <a class="brand" href="maths.html"><span class="brand-mark"><i class="ph-bold ph-shapes" aria-hidden="true"></i></span> Visual Maths</a>
+            <div class="header-actions">
+                <a class="icon-btn" href="exercises.html" aria-label="All exercises" title="All exercises"><i class="ph-bold ph-squares-four" aria-hidden="true"></i></a>
+                <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="ph-bold ph-moon" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <a class="maths-back" href="maths.html">← Maths activities</a>
+        <header class="maths-header"><h1 id="topic-title">Visual Maths</h1><p class="subtitle" id="topic-description">Choose a starting level and practise at your own pace.</p></header>
+        <div id="game"></div>
+        <noscript><p>These interactive activities need JavaScript enabled in your browser.</p></noscript>
+    </main>
+    <aside class="hint-box">
+        <span class="hint-title"><i class="ph-bold ph-lightbulb" aria-hidden="true"></i> A helping hand</span>
+        <p id="topic-hint"></p>
+        <ul>
+            <li>Start at any level. There is no timer.</li>
+            <li>Practice stays at your chosen level for as long as you like.</li>
+            <li>Use paper if it helps.</li>
+            <li>Choose “I don't know” to see how it works.</li>
+            <li>Finish whenever you like to see your results.</li>
+            <li>Choose Level up to move on after 5 correct answers, or Challenge for three lives.</li>
+        </ul>
+        <div class="records" id="records"></div>
+    </aside>
+</div>
+<script src="./js/training-core.js"></script>
+<script src="./js/game-engine.js"></script>
+<script src="./js/maths-diagrams.js"></script>
+<script src="./js/maths-topics.js"></script>
+<script src="./js/maths.js"></script>
+</body>
+</html>

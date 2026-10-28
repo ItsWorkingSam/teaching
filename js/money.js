@@ -223,6 +223,7 @@
 	}
 
 	LevelGame.create({
+		fixedPractice: true,
 		mount: "game",
 		recordsEl: "records",
 		storageKey: "money-shopping-v1",
