@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A solo deduction puzzle. Compare villagers’ roles and claims, follow the clues, and uncover the impostors in Detective Town.">
+    <title>Detective Town · Practice</title>
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+    <link rel="stylesheet" href="./css/training.css">
+    <link rel="stylesheet" href="./css/detective-town.css">
+</head>
+<body class="lantern-page">
+<main class="lantern-app">
+    <div class="app-bar">
+        <a class="brand" href="exercises.html"><span class="brand-mark"><i class="ph-bold ph-graduation-cap" aria-hidden="true"></i></span> Practice</a>
+        <div class="header-actions"><a class="icon-btn" href="exercises.html" aria-label="All exercises"><i class="ph-bold ph-squares-four" aria-hidden="true"></i></a><button class="icon-btn" id="theme-toggle" aria-label="Toggle theme"><i class="ph-bold ph-moon" aria-hidden="true"></i></button></div>
+    </div>
+    <header class="lantern-hero">
+        <div><p class="eyebrow">Observe. Compare. Deduce.</p><h1>Detective Town</h1><p class="subtitle">Everyone has a story. Not everyone is who they say they are.</p></div>
+        <div class="hero-seal" aria-hidden="true"><i class="ph-bold ph-lighthouse"></i><span>A village mystery</span></div>
+    </header>
+    <section id="setup" aria-labelledby="setup-title">
+        <div class="intro-grid">
+            <div class="intro-story"><div class="portrait-line" aria-hidden="true"><img src="assets/detective-town/mara.svg" alt=""><img src="assets/detective-town/tomas.svg" alt=""><img src="assets/detective-town/ada.svg" alt=""><span>?</span></div><h2 id="setup-title">Take a seat at the council.</h2><p>Read each person’s claimed role and information. Compare their stories, spot contradictions, and find every impostor.</p><p class="quiet">No timer. No guesswork required. Every case has one solution.</p></div>
+            <div class="quick-rules"><p class="eyebrow">Your first case</p><ol><li><strong>Read the claims.</strong> Good players tell the truth, except when poisoned at harder levels.</li><li><strong>Compare the roles.</strong> Each genuine role is unique. Duplicate claims mean at least one impostor.</li><li><strong>Choose carefully.</strong> Inspecting and taking notes are free. Accusing a good person costs one of three lives.</li></ol></div>
+        </div>
+        <h2 class="section-heading">Choose your difficulty</h2><div class="difficulty-grid" id="difficulty-grid"></div>
+        <div class="setup-actions"><button class="btn lantern-primary" id="start-case">Begin a case <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button><button class="btn btn-ghost" id="resume-case" hidden>Resume your case</button><span class="quiet" id="saved-record"></span></div>
+    </section>
+    <section id="play" hidden aria-label="Current case">
+        <div class="case-bar"><div><span class="eyebrow" id="case-number"></span><h2 id="case-title" tabindex="-1"></h2></div><div class="case-stats"><span id="impostor-count"></span><span id="lives-count"></span><button class="text-action" id="change-level">Change difficulty</button></div></div>
+        <div class="rule-strip" id="case-rules"></div>
+        <div class="council-grid">
+            <section class="council-panel" aria-labelledby="circle-heading"><div class="panel-heading"><h3 id="circle-heading">The council</h3><span class="quiet">Seats run clockwise ↻</span></div><div id="circle" class="circle"></div><p class="board-note">Select anyone to inspect their story. A selection is not an accusation.</p></section>
+            <section class="inspector" id="inspector" aria-labelledby="inspector-name"></section>
+        </div>
+        <div id="feedback" class="case-feedback" role="status" aria-live="polite"></div>
+        <section id="case-result" class="case-result" hidden aria-labelledby="result-title"></section>
+        <div class="evidence-heading"><div><p class="eyebrow">Your evidence board</p><h2>All the claims</h2></div><button class="btn btn-ghost" id="hint-button"><i class="ph-bold ph-lightbulb" aria-hidden="true"></i> Reasoning hint</button></div>
+        <div id="hint-panel" class="hint-panel" hidden role="status"></div>
+        <div id="claim-list" class="claim-grid"></div>
+        <details class="rules-reference"><summary>Rules &amp; role reference</summary><div class="rules-copy"><p><strong>One genuine player per role.</strong> Good players always claim their real role. Impostors pretend to be a good role; their information may be true or false. A role need not actually be present just because somebody claims it.</p><p><strong>The impostor count is exact.</strong> Find all of them. A correct accusation reveals an impostor without costing a life. A wrong accusation reveals a good player and costs one life. Three mistakes end the case.</p><p><strong>Poison only appears at levels 4 and 5.</strong> Exactly one impostor is the Poisoner. They poison the next seat clockwise if that person is good. The last seat is next to seat 1. A poisoned good player still has their genuine role, but their information may be true or false. If the next seat is another impostor, nobody is poisoned. Other impostors can only bluff; there are no other hidden powers.</p><p><strong>All claims describe the starting circle.</strong> Revealing someone does not change seating, information or poison. “Neighbours” means the two seats immediately beside a person. “Same side” means both good or both impostors.</p><p><strong>Your notes are only notes.</strong> Marking someone as a suspect or likely good never confirms anything and never costs a life.</p></div><div id="role-reference" class="role-reference"></div></details>
+    </section>
+    <noscript><p class="source-area">Enable JavaScript to play this deduction exercise.</p></noscript>
+    <footer class="lantern-footer">An original solo puzzle inspired by social deduction games. <details><summary>Artwork credits</summary><p>Portraits: <a href="https://www.dicebear.com/styles/adventurer/">Adventurer by Lisa Wischofsky, via DiceBear</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Avatar combinations and backgrounds selected for this game. Portraits are stored with the site.</p></details></footer>
+</main>
+<script src="./js/training-core.js"></script><script src="./js/detective-town-engine.js"></script><script src="./js/detective-town.js"></script>
+</body>
+</html>
