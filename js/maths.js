@@ -21,7 +21,7 @@
     document.getElementById('topic-title').textContent = topic.title;
     document.getElementById('topic-description').textContent = topic.description;
     document.getElementById('topic-hint').textContent = topic.hint;
-    const answerText = q => `${q.answer}${q.unit ? ' ' + q.unit : ''}`;
+    const answerText = q => `${q.answerLabel || q.answer}${q.unit ? ' ' + q.unit : ''}`;
     LevelGame.create({
         fixedPractice: true,
         mount: 'game', recordsEl: 'records', storageKey: `visual-maths-${key}-v1`,
@@ -43,7 +43,7 @@
                 else ui.wrong({ typed: value });
             };
             if (q.choices) {
-                const options = Widgets.choices(q.choices.map(value => ({ label: value, value })), submit, { columns: 2 });
+                const options = Widgets.choices(q.choiceOptions || q.choices.map(value => ({ label: value, value })), submit, { columns: 2 });
                 area.append(options);
                 Widgets.focus(options.querySelector('button'));
             } else {

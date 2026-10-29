@@ -7,6 +7,28 @@ const MathsTopics = (() => {
     const time = total => `${Math.floor(((total % 720) + 720) % 720 / 60) || 12}:${String(total % 60).padStart(2, '0')}`;
     const question = (prompt, diagram, answer, explain, extra = {}) => ({ prompt, diagram, answer, explain, ...extra });
     const choices = values => shuffle([...new Set(values.map(String))]);
+    const numberWords = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+    const inWords = n => n <= 20 ? numberWords[n] : `${['', '', 'twenty', 'thirty', 'forty', 'fifty'][Math.floor(n / 10)]}${n % 10 ? '-' + numberWords[n % 10] : ''}`;
+    function spokenTime(value) {
+        const [h, m] = value.split(':').map(Number);
+        return `${inWords(h)} ${m === 0 ? "o'clock" : m < 10 ? 'oh ' + inWords(m) : inWords(m)}`;
+    }
+    function timePhrase(value, words) {
+        const [h, m] = value.split(':').map(Number);
+        const hour = words ? inWords(m > 30 ? h % 12 + 1 : h) : String(m > 30 ? h % 12 + 1 : h);
+        if (!m) return `${hour} o'clock`;
+        if (m === 30) return `half past ${hour}`;
+        const minutes = m > 30 ? 60 - m : m;
+        const amount = minutes === 15 ? 'quarter' : `${words ? inWords(minutes) : minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+        return `${amount} ${m > 30 ? 'to' : 'past'} ${hour}`;
+    }
+    function clockOptions(values) {
+        // Pick each answer's format independently; repeated formats are welcome.
+        return values.map(value => {
+            const format = pick(['digital', 'phrase', 'words', 'spoken']);
+            return { value, format, label: format === 'digital' ? value : format === 'spoken' ? spokenTime(value) : timePhrase(value, format === 'words') };
+        });
+    }
     const topics = {
         clocks: {
             title: 'Reading Clocks', icon: 'ph-clock', description: 'Tell the time, from whole hours to minutes and elapsed time.',
@@ -15,9 +37,10 @@ const MathsTopics = (() => {
             make(l) {
                 const h = int(1, 12), m = l === 1 ? 0 : l === 2 ? pick([0, 15, 30, 45]) : int(0, 59), start = h * 60 + m;
                 const wait = l === 4 ? pick([15, 25, 40, 50, 75, 90]) : 0, answer = time(start + wait);
+                const answers = choices([answer, time(start + wait + 60), time(start + wait + (l === 1 ? 120 : 15)), time(start + wait + (l === 1 ? 180 : 30))]);
                 return question(wait ? `This is the time now. What time will it be in ${wait} minutes?` : 'What time does the clock show?', D.clock(h, m), answer,
                     wait ? `Start at ${time(start)}. Add ${wait} minutes, carrying every 60 minutes into the next hour. The time is ${answer}.` : `The short hand shows ${h}${m ? ' and is moving towards ' + (h % 12 + 1) : ''}. The long hand shows ${m} minutes past the hour: ${answer}.`,
-                    { choices: choices([answer, time(start + wait + 60), time(start + wait + (l === 1 ? 120 : 15)), time(start + wait + (l === 1 ? 180 : 30))]), caption: 'Short, thick hand = hours · Long, thin hand = minutes', review: `Clock at ${time(start)}${wait ? ' + ' + wait + ' minutes' : ''}` });
+                    { choices: answers, choiceOptions: clockOptions(answers), answerLabel: `${answer} (${timePhrase(answer, true)})`, caption: 'Short, thick hand = hours · Long, thin hand = minutes', review: `Clock at ${time(start)}${wait ? ' + ' + wait + ' minutes' : ''}` });
             }
         },
         fractions: {

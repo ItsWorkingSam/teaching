@@ -36,7 +36,7 @@ try {
     const visit = async page => { await send('Page.navigate', { url: base + '/' + page }); for (let i = 0; i < 100; i++) { if (await evaluate(`document.readyState === 'complete' && location.href === ${JSON.stringify(base + '/' + page)}`)) return; await pause(50); } throw Error('Page load timeout'); };
     const click = selector => evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
     const correct = async () => {
-        await evaluate(`(() => { const q = window.testQuestion; if(q.choices) { [...document.querySelectorAll('.option')].find(b => b.textContent === String(q.answer)).click(); } else { const input = document.querySelector('.answer-row input'); input.value = q.answer; input.form.requestSubmit(); } })()`);
+        await evaluate(`(() => { const q = window.testQuestion; if(q.choices) { document.querySelectorAll('.option')[q.choices.indexOf(String(q.answer))].click(); } else { const input = document.querySelector('.answer-row input'); input.value = q.answer; input.form.requestSubmit(); } })()`);
         assert.equal(await evaluate(`document.querySelector('[data-ref="result"]').classList.contains('good')`), true);
     };
     const next = async () => { await click('[data-ref="result"] button'); await pause(30); };
@@ -47,9 +47,10 @@ try {
             await visit(`maths-activity.html?topic=${key}`);
             await evaluate(`(() => { const t = MathsTopics[${JSON.stringify(key)}], make = t.make; t.make = l => (window.testQuestion = make(l)); })()`);
             await click(`[data-level="${level}"]`); await click('[data-mode="practice"]'); await click('.start-btn'); await pause(30);
-            assert.equal(await evaluate(`document.querySelectorAll('.maths-diagram').length`), 1);
+            assert.equal(await evaluate(`document.querySelectorAll('.maths-visual .maths-diagram').length`), 1);
+            if (key === 'clocks') assert.equal(await evaluate(`document.querySelectorAll('.options svg').length`), 0, 'Clock answers use text only');
             await correct(); await next();
-            await evaluate(`(() => { const q = window.testQuestion; if(q.choices) { [...document.querySelectorAll('.option')].find(b => b.textContent !== String(q.answer)).click(); } else { const input = document.querySelector('.answer-row input'); input.value = q.answer + 1; input.form.requestSubmit(); } })()`);
+            await evaluate(`(() => { const q = window.testQuestion; if(q.choices) { document.querySelectorAll('.option')[q.choices.findIndex(value => value !== String(q.answer))].click(); } else { const input = document.querySelector('.answer-row input'); input.value = q.answer + 1; input.form.requestSubmit(); } })()`);
             assert.equal(await evaluate(`document.querySelector('[data-ref="result"]').classList.contains('good')`), false);
             assert.equal(await evaluate(`document.querySelector('[data-ref="result"]').classList.contains('show')`), true);
             await next();
@@ -116,6 +117,9 @@ try {
     await visit('maths-activity.html?topic=unknown');
     assert.match(await evaluate(`document.getElementById('game').textContent`), /Choose an activity/);
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await visit('maths-activity.html?topic=clocks'); await click('[data-level="3"]'); await click('.start-btn'); await pause(30);
+    assert.equal(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), true, 'Mixed clock answers fit on mobile');
+    await writeFile(join(profile, 'mobile-clocks.png'), Buffer.from((await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true })).data, 'base64'));
     await visit('maths-activity.html?topic=shapes'); await click('[data-level="4"]'); await click('.start-btn'); await pause(30);
     assert.equal(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), true, 'No horizontal overflow on mobile');
     await evaluate(`applyTheme('dark')`); await pause(500);
