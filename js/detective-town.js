@@ -10,6 +10,7 @@
     let state = null, puzzle = null, selected = 0;
     function save() { Store.setJSON(KEY, { level: chosen, ...records, case: state }); }
     function setup() {
+        document.body.classList.remove('case-open');
         $('setup').hidden = false; $('play').hidden = true;
         $('difficulty-grid').innerHTML = L.LEVELS.map((l, i) => `<button class="difficulty" data-level="${i}" aria-pressed="${i === chosen}"><span class="eyebrow">Level ${i + 1}${l.poison ? ' · Poison' : ''}</span><strong>${esc(l.name)}</strong><span class="quiet">${esc(l.blurb)}</span><span class="difficulty-count">${l.people} people · ${l.impostors} ${l.impostors === 1 ? 'impostor' : 'impostors'}</span></button>`).join('');
         $('difficulty-grid').querySelectorAll('button').forEach(b => b.onclick = () => {
@@ -33,6 +34,7 @@
     const mistakes = () => state.revealed.filter(i => !bad(i)).length;
     const found = () => state.revealed.filter(bad).length;
     function showCase() {
+        document.body.classList.add('case-open');
         $('setup').hidden = true; $('play').hidden = false;
         $('feedback').textContent = ''; $('hint-panel').hidden = true;
         $('case-title').textContent = L.LEVELS[puzzle.level].name;
@@ -52,7 +54,7 @@
         $('impostor-count').textContent = `${found()} / ${config.impostors} impostors found`;
         $('lives-count').textContent = `♥ ${3 - mistakes()} ${3 - mistakes() === 1 ? 'life' : 'lives'} left`;
         $('hint-button').disabled = state.ended;
-        $('circle').innerHTML = `<div class="circle-centre" aria-hidden="true"><i class="ph-bold ph-lighthouse"></i><strong>Detective Town</strong><span>${config.people} stories<br>${config.impostors} hidden ${config.impostors === 1 ? 'impostor' : 'impostors'}</span></div>` + puzzle.people.map((p, i) => {
+        $('circle').innerHTML = `<div class="circle-centre" aria-hidden="true"><i class="ph-bold ph-lighthouse"></i><span>Select a person</span></div>` + puzzle.people.map((p, i) => {
             const theta = i * 2 * Math.PI / config.people - Math.PI / 2;
             const reveal = state.ended || state.revealed.includes(i);
             const mark = reveal ? (bad(i) ? '!' : '✓') : state.notes[i] === 'suspect' ? '?' : state.notes[i] === 'good' ? '✓?' : '';
@@ -68,7 +70,7 @@
                 select(next); $('circle').querySelector(`[data-seat="${next}"]`).focus({ preventScroll: true });
             };
         });
-        $('claim-list').innerHTML = puzzle.people.map((p, i) => `<article class="claim-card ${i === selected ? 'selected' : ''}"><button class="claim-person" data-inspect="${i}" aria-label="Inspect ${p.name}, seat ${i + 1}"><img src="${portrait(p.name)}" alt=""><span><strong>${i + 1}. ${p.name}</strong><small>Claims ${L.ROLES[p.claim.role].name}</small></span></button><p>“${esc(L.statement(puzzle, i))}”</p><details><summary>Role ability</summary><p>${esc(L.ROLES[p.claim.role].ability)}</p></details><p class="claim-note">${status(i)}</p></article>`).join('');
+        $('claim-list').innerHTML = puzzle.people.map((p, i) => `<article class="claim-card ${i === selected ? 'selected' : ''}"><button class="claim-person" data-inspect="${i}" aria-label="Inspect ${p.name}, seat ${i + 1}"><img src="${portrait(p.name)}" alt=""><span><strong>${i + 1}. ${p.name}</strong><small>Claims ${L.ROLES[p.claim.role].name}</small></span></button><p>“${esc(L.statement(puzzle, i))}”</p><p class="claim-note">${state.ended || state.revealed.includes(i) || state.notes[i] ? status(i) : ''}</p></article>`).join('');
         $('claim-list').querySelectorAll('button').forEach(b => b.onclick = () => { select(Number(b.dataset.inspect)); $('inspector-name').focus(); });
         renderInspector(); renderResult();
     }
@@ -86,7 +88,7 @@
     }
     function renderInspector() {
         const p = puzzle.people[selected], role = L.ROLES[p.claim.role], revealed = state.ended || state.revealed.includes(selected);
-        $('inspector').innerHTML = `<div class="person-heading"><img src="${portrait(p.name)}" alt=""><div><span class="eyebrow">Seat ${selected + 1}</span><h3 id="inspector-name" tabindex="-1">${p.name}</h3><span class="claimed-role">Claims ${role.name}</span></div></div><span class="eyebrow">Their claimed ability</span><p class="ability">${esc(role.ability)}</p><blockquote class="claim-quote">“${esc(L.statement(puzzle, selected))}”</blockquote>${Speech.supported() ? '<button class="listen-btn" id="read-claim"><i class="ph-bold ph-speaker-high" aria-hidden="true"></i> Read this claim aloud</button>' : ''}${revealed ? `<p class="reveal-badge"><strong>${bad(selected) ? 'Impostor' : 'Good'} · ${actualRole(selected)}</strong><br>${state.ended && L.poisoned(puzzle.solution, puzzle.people.length) === selected ? 'This good player was poisoned. Their role is genuine; their information was unreliable.' : bad(selected) ? 'Their role claim was a disguise. Their information could be true or false.' : 'Their role is genuine.'}</p>` : `<p class="eyebrow" style="margin-top:20px">Your private notes</p><div class="note-controls">${[['', 'Unmarked'], ['suspect', 'Suspect'], ['good', 'Likely good']].map(([value, label]) => `<button class="note-btn" data-note="${value}" aria-pressed="${state.notes[selected] === value}">${label}</button>`).join('')}</div><button class="btn accuse-btn" id="accuse">Accuse ${p.name} <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button><p class="accuse-note">Reveals their side. A good player costs one life.</p>`}`;
+        $('inspector').innerHTML = `<div class="person-heading"><img src="${portrait(p.name)}" alt=""><div><span class="eyebrow">Seat ${selected + 1}</span><h3 id="inspector-name" tabindex="-1">${p.name}</h3><span class="claimed-role">Claims ${role.name}</span></div></div><p class="ability">${esc(role.ability)}</p><blockquote class="claim-quote">“${esc(L.statement(puzzle, selected))}”</blockquote>${Speech.supported() ? '<button class="listen-btn" id="read-claim"><i class="ph-bold ph-speaker-high" aria-hidden="true"></i> Read this claim aloud</button>' : ''}${revealed ? `<p class="reveal-badge"><strong>${bad(selected) ? 'Impostor' : 'Good'} · ${actualRole(selected)}</strong><br>${state.ended && L.poisoned(puzzle.solution, puzzle.people.length) === selected ? 'This good player was poisoned. Their role is genuine; their information was unreliable.' : bad(selected) ? 'Their role claim was a disguise. Their information could be true or false.' : 'Their role is genuine.'}</p>` : `<p class="eyebrow notes-label">Your notes</p><div class="note-controls">${[['', 'Unmarked'], ['suspect', 'Suspect'], ['good', 'Likely good']].map(([value, label]) => `<button class="note-btn" data-note="${value}" aria-pressed="${state.notes[selected] === value}">${label}</button>`).join('')}</div><button class="btn accuse-btn" id="accuse">Accuse ${p.name} <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button><p class="accuse-note">Reveals their side. A good player costs one life.</p>`}`;
         if ($('read-claim')) $('read-claim').onclick = () => Speech.say(`${p.name} claims to be the ${role.name}. ${role.ability} Their information: ${L.statement(puzzle, selected)}`);
         $('inspector').querySelectorAll('[data-note]').forEach(b => b.onclick = () => { const note = b.dataset.note; state.notes[selected] = note; save(); render(); $('inspector').querySelector(`[data-note="${note}"]`).focus({ preventScroll: true }); });
         if ($('accuse')) $('accuse').onclick = accuse;
@@ -100,7 +102,7 @@
         save(); render();
         $('feedback').classList.toggle('good', bad(i));
         $('feedback').textContent = bad(i) ? `${puzzle.people[i].name} is an impostor (${actualRole(i)}). No life lost.${state.won ? ' You found them all.' : ' Keep comparing the remaining claims.'}` : `${puzzle.people[i].name} is good. One life lost.${state.ended ? ' The case has ended; the explanation is below.' : ` ${3 - mistakes()} lives remain. Their claimed role is genuine${L.LEVELS[puzzle.level].poison ? ', but poison may affect their information' : ''}.`}`;
-        if (state.ended) $('result-title').focus({ preventScroll: true });
+        if (state.ended) $('result-title').focus();
         else $('inspector-name').focus({ preventScroll: true });
     }
     function hypothesis(w) {

@@ -30,15 +30,17 @@
     <section id="play" hidden aria-label="Current case">
         <div class="case-bar"><div><span class="eyebrow" id="case-number"></span><h2 id="case-title" tabindex="-1"></h2></div><div class="case-stats"><span id="impostor-count"></span><span id="lives-count"></span><button class="text-action" id="change-level">Change difficulty</button></div></div>
         <div class="rule-strip" id="case-rules"></div>
+        <div id="feedback" class="case-feedback" role="status" aria-live="polite"></div>
+        <section id="case-result" class="case-result" hidden aria-labelledby="result-title"></section>
         <div class="council-grid">
             <section class="council-panel" aria-labelledby="circle-heading"><div class="panel-heading"><h3 id="circle-heading">The council</h3><span class="quiet">Seats run clockwise ↻</span></div><div id="circle" class="circle"></div><p class="board-note">Select anyone to inspect their story. A selection is not an accusation.</p></section>
             <section class="inspector" id="inspector" aria-labelledby="inspector-name"></section>
+            <section class="evidence-panel" aria-labelledby="evidence-title">
+                <div class="evidence-heading"><h2 id="evidence-title">All the claims</h2><button class="btn btn-ghost" id="hint-button"><i class="ph-bold ph-lightbulb" aria-hidden="true"></i> Hint</button></div>
+                <div id="hint-panel" class="hint-panel" hidden role="status"></div>
+                <div id="claim-list" class="claim-grid"></div>
+            </section>
         </div>
-        <div id="feedback" class="case-feedback" role="status" aria-live="polite"></div>
-        <section id="case-result" class="case-result" hidden aria-labelledby="result-title"></section>
-        <div class="evidence-heading"><div><p class="eyebrow">Your evidence board</p><h2>All the claims</h2></div><button class="btn btn-ghost" id="hint-button"><i class="ph-bold ph-lightbulb" aria-hidden="true"></i> Reasoning hint</button></div>
-        <div id="hint-panel" class="hint-panel" hidden role="status"></div>
-        <div id="claim-list" class="claim-grid"></div>
         <details class="rules-reference"><summary>Rules &amp; role reference</summary><div class="rules-copy"><p><strong>One genuine player per role.</strong> Good players always claim their real role. Impostors pretend to be a good role; their information may be true or false. A role need not actually be present just because somebody claims it.</p><p><strong>The impostor count is exact.</strong> Find all of them. A correct accusation reveals an impostor without costing a life. A wrong accusation reveals a good player and costs one life. Three mistakes end the case.</p><p><strong>Poison only appears at levels 4 and 5.</strong> Exactly one impostor is the Poisoner. They poison the next seat clockwise if that person is good. The last seat is next to seat 1. A poisoned good player still has their genuine role, but their information may be true or false. If the next seat is another impostor, nobody is poisoned. Other impostors can only bluff; there are no other hidden powers.</p><p><strong>All claims describe the starting circle.</strong> Revealing someone does not change seating, information or poison. “Neighbours” means the two seats immediately beside a person. “Same side” means both good or both impostors.</p><p><strong>Your notes are only notes.</strong> Marking someone as a suspect or likely good never confirms anything and never costs a life.</p></div><div id="role-reference" class="role-reference"></div></details>
     </section>
     <noscript><p class="source-area">Enable JavaScript to play this deduction exercise.</p></noscript>
