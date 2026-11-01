@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex, nofollow">
+	<title>Harbour &amp; Table | QR practice</title>
+	<style>
+		:root { color-scheme: light; --ink: #203c36; --paper: #faf7ef; --line: #dbdfd5; --muted: #53665f; }
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--paper); color: var(--ink); font: 18px/1.6 system-ui, sans-serif; }
+		a { color: inherit; text-underline-offset: 4px; }
+		button, .button { font: inherit; font-weight: 650; display: inline-block; padding: 12px 20px; border: 2px solid var(--ink); border-radius: 7px; background: var(--ink); color: white; cursor: pointer; text-decoration: none; }
+		button:hover, .button:hover { background: #34574b; }
+		:focus-visible { outline: 3px solid #b76015; outline-offset: 5px; }
+		.notice { text-align: center; background: #e5ebdf; padding: 9px 18px; font-size: 14px; }
+		header, main { width: min(920px, calc(100% - 40px)); margin: auto; }
+		header { padding: 30px 0 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--line); }
+		.brand { font: bold 26px Georgia, serif; text-decoration: none; }
+		nav { display: flex; gap: 22px; flex-wrap: wrap; }
+		nav a[aria-current="page"] { font-weight: bold; text-decoration-thickness: 3px; }
+		section { padding: 46px 0 70px; }
+		section[hidden], [hidden] { display: none !important; }
+		.eyebrow { font-size: 13px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+		h1 { font: 52px/1.1 Georgia, serif; margin: 0 0 18px; }
+		h2 { font: 30px/1.2 Georgia, serif; margin: 28px 0 14px; }
+		p { margin: 0 0 20px; }
+		.intro { max-width: 650px; color: var(--muted); }
+		.filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0; }
+		.filters button { background: transparent; color: var(--ink); padding: 8px 17px; border-color: var(--line); border-radius: 30px; }
+		.filters button[aria-pressed="true"] { background: var(--ink); color: white; border-color: var(--ink); }
+		.menu-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; }
+		.dish { padding: 21px 0; border-top: 1px solid var(--line); }
+		.dish h3 { display: flex; justify-content: space-between; gap: 18px; margin: 0 0 6px; font-size: 19px; }
+		.price { white-space: nowrap; font-weight: 500; }
+		.dish p { margin: 0; font-size: 16px; color: var(--muted); }
+		.note { margin-top: 28px; font-size: 14px; color: var(--muted); }
+		.voucher { max-width: 650px; background: #fffdf7; border: 2px dashed #9b6a38; border-radius: 16px; padding: 36px; margin: 30px 0; }
+		.voucher .offer { font: 48px/1.1 Georgia, serif; margin: 10px 0 20px; }
+		.code { font: bold 28px/1.5 monospace; letter-spacing: .12em; display: block; margin: 10px 0; }
+		.terms { font-size: 16px; padding-left: 22px; }
+		.event-card { background: #e5ebdf; border-radius: 12px; padding: 26px; display: grid; grid-template-columns: 95px 1fr; gap: 26px; margin: 30px 0; }
+		.date { background: #fffdf7; border-radius: 8px; text-align: center; padding: 12px 6px; align-self: start; font-size: 15px; }
+		.date strong { display: block; font: 43px/1.1 Georgia, serif; }
+		.event-card h2 { margin: 0 0 12px; }
+		.event-card p { margin-bottom: 8px; }
+		details { border-top: 1px solid var(--line); padding: 17px 0; }
+		summary { cursor: pointer; font-weight: 650; }
+		details p { margin: 12px 0 0; }
+		@media (max-width: 600px) {
+			h1 { font-size: 40px; }
+			section { padding-top: 30px; }
+			.menu-grid { grid-template-columns: 1fr; }
+			.voucher { padding: 25px; }
+			.voucher .offer { font-size: 39px; }
+			.event-card { grid-template-columns: 65px 1fr; padding: 20px; gap: 18px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="notice">QR practice · Fictional café, voucher and event. No orders, payments or bookings.</div>
+	<header>
+		<a class="brand" href="#menu">Harbour &amp; Table</a>
+		<nav aria-label="Examples"><a href="#menu">Menu</a><a href="#voucher">Voucher</a><a href="#event">Event</a></nav>
+	</header>
+	<main>
+		<section id="menu" aria-labelledby="menu-title">
+			<p class="eyebrow">Timaru · Café menu</p>
+			<h1 id="menu-title" tabindex="-1">Something good<br>by the coast.</h1>
+			<p class="intro">Coffee, fresh baking and a leisurely lunch. All prices are in New Zealand dollars and include GST.</p>
+			<div class="filters" role="group" aria-label="Filter menu">
+				<button type="button" data-filter="all" aria-pressed="true">All</button>
+				<button type="button" data-filter="food" aria-pressed="false">Food</button>
+				<button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+			</div>
+			<div class="menu-grid">
+				<article class="dish" data-category="food"><h3>Cheese scone <span class="price">$6.50</span></h3><p>Served warm with butter and tomato relish.</p></article>
+				<article class="dish" data-category="food"><h3>Avocado on toast <span class="price">$19.00</span></h3><p>Sourdough, smashed avocado, feta and lemon.</p></article>
+				<article class="dish" data-category="food"><h3>Kūmara soup <span class="price">$16.00</span></h3><p>Roasted kūmara and ginger, with toasted sourdough.</p></article>
+				<article class="dish" data-category="food"><h3>Fish of the day <span class="price">$26.00</span></h3><p>Beer-battered fish, chips, slaw and tartare sauce.</p></article>
+				<article class="dish" data-category="food"><h3>Carrot cake <span class="price">$8.50</span></h3><p>A generous slice with cream cheese icing.</p></article>
+				<article class="dish" data-category="food"><h3>Lemon slice <span class="price">$6.00</span></h3><p>A tangy lemon and coconut café favourite.</p></article>
+				<article class="dish" data-category="drinks"><h3>Flat white <span class="price">$5.50</span></h3><p>Double espresso with steamed milk.</p></article>
+				<article class="dish" data-category="drinks"><h3>Long black <span class="price">$5.00</span></h3><p>Double espresso over hot water.</p></article>
+				<article class="dish" data-category="drinks"><h3>Hot chocolate <span class="price">$6.00</span></h3><p>Rich chocolate with steamed milk.</p></article>
+				<article class="dish" data-category="drinks"><h3>Tea <span class="price">$5.00</span></h3><p>English breakfast, Earl Grey or peppermint.</p></article>
+			</div>
+			<p class="note">Example menu for scanning practice. These items cannot be ordered.</p>
+		</section>
+		<section id="voucher" aria-labelledby="voucher-title">
+			<p class="eyebrow">Harbour &amp; Table · Café offer</p>
+			<h1 id="voucher-title" tabindex="-1">Coffee with company.</h1>
+			<p class="intro">A café voucher example. Tap below to reveal the code you would show at the counter.</p>
+			<div class="voucher">
+				<p class="eyebrow">Practice voucher</p>
+				<p class="offer">Two coffees<br>for $8</p>
+				<p>Two regular flat whites, cappuccinos, lattes or long blacks.</p>
+				<button type="button" id="reveal" aria-expanded="false" aria-controls="voucher-code">Show voucher code</button>
+				<div id="voucher-code" hidden><span class="code">COFFEE-DEMO</span><p>Practice code only. This offer cannot be redeemed.</p></div>
+			</div>
+			<h2>Example terms</h2>
+			<ul class="terms"><li>One voucher per visit.</li><li>Regular coffees only; extras would cost more.</li><li>Cannot be combined with another offer.</li><li>Demonstration only: no monetary value or participating café.</li></ul>
+		</section>
+		<section id="event" aria-labelledby="event-title">
+			<p class="eyebrow">Canterbury · Community event</p>
+			<h1 id="event-title" tabindex="-1">The Great Garden Swap</h1>
+			<p class="intro">Bring a plant, take a plant and share a few growing tips. An example of the information you might find after scanning an event poster.</p>
+			<div class="event-card">
+				<div class="date">FEB<strong>20</strong>2027</div>
+				<div><h2>Plants, cuttings &amp; conversation</h2><p><strong>Saturday 20 February 2027</strong><br>10 am–12 noon · New Zealand daylight time</p><p>Demo Community Hall, Timaru<br>Fictional venue · Free entry example</p></div>
+			</div>
+			<p>Bring labelled seedlings, spare seeds or healthy cuttings. Beginners are welcome to browse and ask questions, even without a plant to swap.</p>
+			<button type="button" id="calendar">Add demo event to calendar</button>
+			<p class="note" id="calendar-status" role="status">Downloads a calendar file. Your calendar app may ask you to open or import it. This is not a real event.</p>
+			<h2>Before you come</h2>
+			<details><summary>What would I bring?</summary><p>A labelled plant or seed packet, a bag for taking plants home and a reusable cup.</p></details>
+			<details><summary>Would I need to book?</summary><p>This example is a drop-in event. There is no booking form and no personal information is collected.</p></details>
+			<details><summary>Is this event actually happening?</summary><p>No. The event and venue are fictional and are provided for QR-code practice.</p></details>
+		</section>
+	</main>
+	<script>
+		const panels = [...document.querySelectorAll('main > section')];
+		function showPage(moveFocus = false) {
+			const key = location.hash.slice(1);
+			const active = panels.find(panel => panel.id === key) || panels[0];
+			panels.forEach(panel => { panel.hidden = panel !== active; });
+			document.querySelectorAll('nav a').forEach(link => {
+				if (link.hash === '#' + active.id) link.setAttribute('aria-current', 'page');
+				else link.removeAttribute('aria-current');
+			});
+			document.title = active.querySelector('h1').textContent + ' | QR practice';
+			if (moveFocus) active.querySelector('h1').focus({ preventScroll: true });
+			window.scrollTo(0, 0);
+		}
+		window.addEventListener('hashchange', () => showPage(true));
+		showPage();
+		document.querySelectorAll('[data-filter]').forEach(button => {
+			button.addEventListener('click', () => {
+				document.querySelectorAll('[data-filter]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+				document.querySelectorAll('.dish').forEach(dish => { dish.hidden = button.dataset.filter !== 'all' && dish.dataset.category !== button.dataset.filter; });
+			});
+		});
+		document.getElementById('reveal').addEventListener('click', event => {
+			const code = document.getElementById('voucher-code');
+			code.hidden = !code.hidden;
+			event.currentTarget.setAttribute('aria-expanded', String(!code.hidden));
+			event.currentTarget.textContent = code.hidden ? 'Show voucher code' : 'Hide voucher code';
+		});
+		document.getElementById('calendar').addEventListener('click', () => {
+			const content = [
+				'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//QR Demo//NZ//EN', 'CALSCALE:GREGORIAN',
+				'BEGIN:VEVENT', 'UID:garden-swap-20270220@example.com', 'DTSTAMP:20261101T000000Z',
+				'DTSTART:20270219T210000Z', 'DTEND:20270219T230000Z',
+				'SUMMARY:DEMO - The Great Garden Swap', 'LOCATION:Fictional community hall - Timaru',
+				'DESCRIPTION:QR practice only. This is not a real event.', 'END:VEVENT', 'END:VCALENDAR', ''
+			].join('\r\n');
+			const url = URL.createObjectURL(new Blob([content], { type: 'text/calendar;charset=utf-8' }));
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'demo-garden-swap.ics';
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			setTimeout(() => URL.revokeObjectURL(url), 30000);
+			document.getElementById('calendar-status').textContent = 'Calendar file requested. Open demo-garden-swap.ics from your downloads to import the practice event.';
+		});
+	</script>
+</body>
+</html>
