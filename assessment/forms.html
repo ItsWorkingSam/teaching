@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Application Practice</title>
+<style>
+/* Layout idea: one narrow, phone-first column; one step on screen at a time; numbered steps across the top. No external fonts or scripts. */
+:root {
+  --paper: #f5f7f6;
+  --surface: #ffffff;
+  --ink: #17232a;
+  --muted: #475a62;
+  --line: #c3cfcc;
+  --line-strong: #6b7d84;
+  --accent: #155e75;
+  --accent-soft: #e2f0f4;
+  --accent-ink: #ffffff;
+  --ok: #1c6b35;
+  --ok-soft: #e4f3e8;
+  --error: #a02c1a;
+  --error-soft: #fcebe7;
+  --note: #fff6dc;
+  --note-line: #c99a1e;
+  --focus: #c2410c;
+  --font: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #10181c; --surface: #182328; --ink: #edf3f2; --muted: #b3c3c2;
+    --line: #34464d; --line-strong: #8aa0a6; --accent: #7cc7dd; --accent-soft: #19323b;
+    --accent-ink: #0b1a20; --ok: #8bd9a1; --ok-soft: #17301f; --error: #ff9c87;
+    --error-soft: #3a1d17; --note: #2c2612; --note-line: #b88f2a; --focus: #ffb86b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10181c; --surface: #182328; --ink: #edf3f2; --muted: #b3c3c2;
+  --line: #34464d; --line-strong: #8aa0a6; --accent: #7cc7dd; --accent-soft: #19323b;
+  --accent-ink: #0b1a20; --ok: #8bd9a1; --ok-soft: #17301f; --error: #ff9c87;
+  --error-soft: #3a1d17; --note: #2c2612; --note-line: #b88f2a; --focus: #ffb86b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font); font-size: 1.125rem; line-height: 1.55;
+}
+.wrap { max-width: 42rem; margin: 0 auto; padding: 0 16px 48px; }
+h1, h2, h3 { line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.2rem; }
+p { margin: 0; }
+a { color: var(--accent); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* Header */
+header.top { padding: 24px 0 16px; display: grid; gap: 12px; }
+.kicker { color: var(--muted); font-size: 1rem; }
+.privacy {
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+  background: var(--note); border: 2px solid var(--note-line); border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.privacy svg { width: 28px; height: 28px; margin-top: 2px; color: var(--ink); }
+.privacy strong { display: block; }
+.privacy ul { margin: 6px 0 0; padding-left: 1.2em; display: grid; gap: 2px; }
+
+/* Step navigation */
+nav.steps ol { list-style: none; margin: 8px 0 20px; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+nav.steps button {
+  width: 100%; min-height: 64px; display: grid; justify-items: center; align-content: center; gap: 2px;
+  font: inherit; font-size: 0.95rem; line-height: 1.2; text-align: center;
+  background: var(--surface); color: var(--ink); border: 2px solid var(--line); border-radius: var(--radius);
+  padding: 8px 4px; cursor: pointer;
+}
+nav.steps .num {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--line-strong); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+nav.steps button[aria-current="step"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+nav.steps button[aria-current="step"] .num { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+nav.steps .status { font-size: 0.85rem; color: var(--ok); font-weight: 600; }
+@media (max-width: 460px) {
+  nav.steps ol { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Panels */
+section.step { display: grid; gap: 20px; }
+.step-head { display: grid; gap: 8px; }
+.step-label { color: var(--muted); font-weight: 600; font-size: 1rem; }
+.tag-start {
+  display: inline-block; background: var(--accent); color: var(--accent-ink); font-weight: 700;
+  font-size: 0.9rem; padding: 2px 10px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+}
+.lead { max-width: 65ch; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+
+/* Buttons */
+.btn {
+  font: inherit; font-weight: 600; min-height: 48px; padding: 10px 18px; border-radius: var(--radius);
+  border: 2px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
+}
+.btn.secondary { background: var(--surface); color: var(--accent); }
+.btn.quiet { background: transparent; color: var(--ink); border-color: var(--line-strong); font-weight: 500; }
+.btn.danger { background: var(--error); border-color: var(--error); color: var(--surface); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-row.split { justify-content: space-between; }
+.say {
+  font: inherit; font-size: 0.95rem; font-weight: 600; min-height: 44px; padding: 6px 12px;
+  border-radius: 999px; border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer; justify-self: start;
+}
+.say svg { width: 20px; height: 20px; }
+.no-speech .say { display: none; }
+
+/* Key words */
+.group { display: grid; gap: 12px; }
+.vocab { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .vocab { grid-template-columns: 1fr 1fr; } }
+.word { display: grid; gap: 6px; align-content: start; }
+.word .term { font-size: 1.2rem; font-weight: 700; }
+.word .aka { color: var(--muted); font-size: 1rem; }
+.word .eg { background: var(--paper); border-radius: 8px; padding: 8px 10px; font-size: 1rem; }
+.word .eg b { font-weight: 600; }
+.mock { display: inline-block; border: 2px solid var(--line-strong); border-radius: 6px; padding: 0 8px; background: var(--surface); }
+.phrases ul { margin: 8px 0 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.phrases .card { background: var(--accent-soft); border-color: var(--accent); }
+
+/* Quiz */
+.q { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 16px; margin: 0; display: grid; gap: 10px; }
+.q legend { padding: 0; font-weight: 600; float: left; width: 100%; }
+.q legend + * { clear: both; }
+.q .qnum { color: var(--muted); font-weight: 600; display: block; font-size: 0.95rem; }
+.opts { display: grid; gap: 8px; }
+.opt {
+  font: inherit; text-align: left; min-height: 48px; padding: 10px 14px; border-radius: 8px;
+  border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+}
+.opt .mark { width: 26px; height: 26px; flex: none; border-radius: 50%; border: 2px solid var(--line-strong); display: inline-grid; place-items: center; font-weight: 700; }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.opt.right .mark { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.opt.wrong { border-color: var(--error); background: var(--error-soft); }
+.opt.wrong .mark { background: var(--error); border-color: var(--error); color: var(--surface); }
+.opt:disabled { cursor: default; }
+.feedback { font-weight: 600; }
+.feedback.good { color: var(--ok); }
+.feedback.bad { color: var(--error); }
+.feedback span { font-weight: 400; color: var(--ink); }
+.summary-good { background: var(--ok-soft); border: 2px solid var(--ok); border-radius: var(--radius); padding: 14px 16px; }
+
+/* Form */
+.progress { display: grid; gap: 6px; }
+.progress .bar { height: 12px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.progress .fill { height: 100%; background: var(--accent); border-radius: 999px; }
+.progress .ptext { font-weight: 600; font-variant-numeric: tabular-nums; }
+.form-section { display: grid; gap: 20px; }
+.field { border: 0; margin: 0; padding: 0; display: grid; gap: 6px; min-width: 0; }
+.field > label, .field > legend { font-weight: 600; padding: 0; }
+.field legend { float: left; width: 100%; }
+.field legend + * { clear: both; }
+.req { color: var(--error); font-weight: 700; margin-left: 4px; }
+.opt-tag { color: var(--muted); font-weight: 400; font-size: 1rem; margin-left: 6px; }
+.hint { color: var(--muted); font-size: 1rem; }
+.err { color: var(--error); font-weight: 600; display: flex; gap: 8px; align-items: start; }
+.err::before {
+  content: "!"; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--error); color: var(--surface);
+  display: inline-grid; place-items: center; font-weight: 800; font-size: 0.95rem; margin-top: 2px;
+}
+.field.has-err { border-left: 4px solid var(--error); padding-left: 12px; }
+input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+  font: inherit; color: var(--ink); background: var(--surface); width: 100%;
+  min-height: 52px; padding: 10px 12px; border: 2px solid var(--line-strong); border-radius: 8px;
+}
+textarea { min-height: 120px; resize: vertical; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--error); border-width: 3px; }
+.w2 { max-width: 5rem; } .w4 { max-width: 7rem; } .w-id { max-width: 14rem; }
+.date { display: flex; gap: 12px; flex-wrap: wrap; }
+.date > div { display: grid; gap: 4px; }
+.date label { font-size: 1rem; font-weight: 600; }
+.choices { display: grid; gap: 8px; }
+.choices.cols { grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); }
+.choice {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px;
+  border: 2px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer;
+}
+.choice input { width: 24px; height: 24px; flex: none; accent-color: var(--accent); margin: 0; }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.single { display: flex; gap: 12px; align-items: start; padding: 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; font-weight: 600; }
+.single input { width: 26px; height: 26px; flex: none; accent-color: var(--accent); margin: 2px 0 0; }
+.single:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.starters { display: flex; flex-wrap: wrap; gap: 8px; }
+.starters button { font: inherit; font-size: 1rem; min-height: 44px; padding: 6px 12px; border-radius: 999px; border: 2px dashed var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
+.count { color: var(--muted); font-size: 1rem; font-variant-numeric: tabular-nums; }
+details.help { font-size: 1rem; }
+details.help summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 44px; display: flex; align-items: center; gap: 6px; width: fit-content; }
+details.help p { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+.err-summary { background: var(--error-soft); border: 2px solid var(--error); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; }
+.err-summary ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.err-summary a { color: var(--error); text-underline-offset: 3px; }
+.err-summary a strong { font-weight: 700; }
+.section-intro { display: grid; gap: 8px; }
+
+/* Review */
+.review-sec { display: grid; gap: 8px; }
+.review-sec dl { margin: 0; display: grid; gap: 0; }
+.review-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: center; }
+.review-row dt { font-weight: 600; font-size: 1rem; color: var(--muted); }
+.review-row dd { margin: 0; grid-column: 1; overflow-wrap: anywhere; }
+.review-row .change { grid-column: 2; grid-row: 1 / span 2; }
+.review-row .empty { color: var(--muted); font-style: italic; }
+.success { background: var(--ok-soft); border: 2px solid var(--ok); border-radius: var(--radius); padding: 20px; display: grid; gap: 12px; }
+.success h2 { color: var(--ok); }
+.success ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.status-msg { background: var(--ok-soft); border: 2px solid var(--ok); border-radius: var(--radius); padding: 12px 16px; font-weight: 600; }
+
+footer.bottom { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+.confirm { background: var(--error-soft); border: 2px solid var(--error); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 10px; }
+.small { font-size: 1rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="kicker">Kia ora! (Hello!)</p>
+    <h1>Job Application Practice</h1>
+    <p class="lead">Practise filling in an online job application, step by step. The words you learn here are also on course enrolment forms and Work and Income forms.</p>
+    <div class="privacy" role="note" aria-label="Privacy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <div>
+        <strong>Practice only. Your information is safe.</strong>
+        <ul>
+          <li>You do not need to use your real information. Made-up details are fine.</li>
+          <li>Nothing you type leaves this device. It is not sent and not saved.</li>
+          <li>If you close this page, your answers are gone.</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <nav class="steps" aria-label="Steps">
+    <ol>
+      <li><button type="button" data-step="1"><span class="num">1</span><span>Key words</span><span class="status" id="st-1"></span></button></li>
+      <li><button type="button" data-step="2"><span class="num">2</span><span>Check your words</span><span class="status" id="st-2"></span></button></li>
+      <li><button type="button" data-step="3"><span class="num">3</span><span>Practice application</span><span class="status" id="st-3"></span></button></li>
+      <li><button type="button" data-step="4"><span class="num">4</span><span>Check and submit</span><span class="status" id="st-4"></span></button></li>
+    </ol>
+  </nav>
+
+  <p class="status-msg" id="cleared-msg" role="status" hidden>Your answers have been cleared.</p>
+
+  <main>
+    <!-- STEP 1 -->
+    <section class="step" id="step-1" aria-labelledby="h-1">
+      <div class="step-head">
+        <p class="step-label">Step 1 of 4 <span class="tag-start">Start here</span></p>
+        <h2 id="h-1" tabindex="-1">Key words</h2>
+        <p class="lead" id="s1-intro">These words are on many New Zealand forms. Read each word and what it means. Tap "Hear it" to listen.</p>
+        <button type="button" class="say" data-say-el="s1-intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>Hear it</button>
+      </div>
+      <div id="vocab-groups" class="group"></div>
+      <div class="phrases">
+        <div class="card">
+          <h3>Not sure? You can ask:</h3>
+          <ul id="phrases-1"></ul>
+        </div>
+      </div>
+      <div class="btn-row"><button type="button" class="btn" id="to-2">Next: Check your words</button></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step-2" aria-labelledby="h-2" hidden>
+      <div class="step-head">
+        <p class="step-label">Step 2 of 4</p>
+        <h2 id="h-2" tabindex="-1">Check your words</h2>
+        <p class="lead">Choose an answer for each question. If it is not right, you can try again. There is no time limit.</p>
+      </div>
+      <div id="quiz" class="group"></div>
+      <div id="quiz-done" class="summary-good" role="status" hidden></div>
+      <div class="btn-row split">
+        <button type="button" class="btn quiet" data-goto="1">Back to key words</button>
+        <button type="button" class="btn" id="to-3">Next: Practice application</button>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step-3" aria-labelledby="h-3" hidden>
+      <div class="step-head">
+        <p class="step-label">Step 3 of 4</p>
+        <h2 id="h-3" tabindex="-1">Practice application: Riverside Supplies</h2>
+        <p class="lead">Riverside Supplies is a pretend business. Fill in each section, then tap Next. A star <span class="req" aria-hidden="true">*</span><span class="sr-only">(star)</span> means you must fill in that box.</p>
+      </div>
+      <div class="progress" aria-live="polite">
+        <p class="ptext" id="ptext"></p>
+        <div class="bar" aria-hidden="true"><div class="fill" id="pfill"></div></div>
+      </div>
+      <form id="app" novalidate autocomplete="off">
+        <div id="err-summary" class="err-summary" role="alert" tabindex="-1" hidden></div>
+        <div id="sections"></div>
+      </form>
+      <div class="btn-row split">
+        <button type="button" class="btn quiet" id="sec-back">Back</button>
+        <button type="button" class="btn" id="sec-next">Next</button>
+      </div>
+      <details class="help phrases-mini">
+        <summary>Not sure? Phrases to ask for help</summary>
+        <p><span id="phrases-3"></span></p>
+      </details>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" id="step-4" aria-labelledby="h-4" hidden>
+      <div class="step-head">
+        <p class="step-label">Step 4 of 4</p>
+        <h2 id="h-4" tabindex="-1">Check and submit</h2>
+      </div>
+      <div id="not-ready" hidden>
+        <div class="card" style="display:grid;gap:12px">
+          <p id="not-ready-text">You have not finished the practice application yet.</p>
+          <div class="btn-row"><button type="button" class="btn" id="go-fix">Go to the application</button></div>
+        </div>
+      </div>
+      <div id="review-wrap" hidden>
+        <p class="lead" id="s4-intro">Read your answers. If something is wrong, tap Change. When everything is right, tap Submit.</p>
+        <button type="button" class="say" data-say-el="s4-intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>Hear it</button>
+        <div id="review" class="group" style="margin-top:16px"></div>
+        <div class="btn-row" style="margin-top:20px"><button type="button" class="btn" id="submit-btn">Submit application</button></div>
+      </div>
+      <div id="success" class="success" role="status" tabindex="-1" hidden></div>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <div>
+      <button type="button" class="btn quiet" id="clear-btn">Clear my answers</button>
+    </div>
+    <div class="confirm" id="clear-confirm" hidden>
+      <p><strong>Clear all your answers?</strong> This removes everything you typed on this page.</p>
+      <div class="btn-row">
+        <button type="button" class="btn danger" id="clear-yes">Yes, clear my answers</button>
+        <button type="button" class="btn quiet" id="clear-no">No, keep them</button>
+      </div>
+    </div>
+    <p class="small">Practice resource. Riverside Supplies is not a real business. This page does not send, save or track anything you type.</p>
+  </footer>
+</div>
+
+<noscript><p style="padding:16px">This practice page needs JavaScript turned on.</p></noscript>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var THIS_YEAR = new Date().getFullYear();
+  var SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>';
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  /* ---------- Read aloud (instructions only, never learner input) ---------- */
+  var canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  if (!canSpeak) document.documentElement.classList.add("no-speech");
+  var voices = [];
+  function loadVoices() { try { voices = window.speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
+  if (canSpeak) { loadVoices(); try { window.speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
+  function say(text) {
+    if (!canSpeak) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(String(text).replace(/\*/g, "").replace(/\s+/g, " ").trim());
+      var pick = function (p) { for (var i = 0; i < voices.length; i++) { if (voices[i].lang && voices[i].lang.indexOf(p) === 0) return voices[i]; } return null; };
+      var v = pick("en-NZ") || pick("en-AU") || pick("en-GB") || pick("en");
+      if (v) u.voice = v;
+      u.lang = v ? v.lang : "en-NZ";
+      u.rate = 0.9;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function sayBtn(textOrFn, label) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "say";
+    b.innerHTML = SPEAKER + (label || "Hear it");
+    b.addEventListener("click", function () { say(typeof textOrFn === "function" ? textOrFn() : textOrFn); });
+    return b;
+  }
+  $$("[data-say-el]").forEach(function (b) {
+    b.addEventListener("click", function () { var el = document.getElementById(b.getAttribute("data-say-el")); if (el) say(el.textContent); });
+  });
+
+  /* ---------- Step 1: key words ---------- */
+  var VOCAB = [
+    { group: "Words about you", words: [
+      { t: "Given name", aka: "Also called: first name", m: "Your own name. Not your family name.", eg: "Lena Brooks. Given name: <b>Lena</b>" },
+      { t: "Surname", aka: "Also called: last name, family name", m: "The name you share with your family. Some documents write it in CAPITAL letters.", eg: "Lena Brooks. Surname: <b>Brooks</b>" },
+      { t: "Preferred name", aka: "", m: "The name you like people to call you.", eg: "Elizabeth likes to be called <b>Liz</b>" },
+      { t: "Date of birth (DOB)", aka: "", m: "The day you were born. In New Zealand we write the day first, then the month, then the year.", eg: "<b>07/03/2002</b> means 7 March 2002" },
+      { t: "IRD number", aka: "", m: "Your tax number from Inland Revenue (Te Tari Taake). It has 8 or 9 numbers.", eg: "<b>123-456-789</b>" },
+      { t: "Client number", aka: "", m: "Your number with an organisation, like Work and Income. It is on their letters to you.", eg: "Client number: <b>123 456 789</b>" },
+      { t: "Emergency contact", aka: "", m: "A person to call if you are hurt or sick.", eg: "Your partner, a family member or a friend" }
+    ]},
+    { group: "Parts of a form", words: [
+      { t: "Required *", aka: "", m: "A star * means you must fill in this box.", eg: "Phone number <b style=\"color:var(--error)\">*</b>" },
+      { t: "Optional", aka: "", m: "You can leave this box empty.", eg: "Preferred name (optional)" },
+      { t: "Drop-down", aka: "Also called: drop-down menu, list", m: "Tap it to see a list. Choose one thing from the list.", eg: "<span class=\"mock\">Choose a job &#9662;</span>" },
+      { t: "Tick box", aka: "Also called: checkbox", m: "A square box. You can often tick more than one.", eg: "&#9745; Monday &nbsp; &#9745; Tuesday &nbsp; &#9744; Sunday" },
+      { t: "Radio button", aka: "", m: "A round button. You can choose only one.", eg: "&#9673; Yes &nbsp; &#9675; No" },
+      { t: "Declaration", aka: "", m: "A sentence you agree to. You tick a box to say yes.", eg: "&#9745; My information is true and correct." },
+      { t: "Submit", aka: "Also called: send, apply", m: "Send the form. Always check your answers first.", eg: "<span class=\"mock\">Submit</span>" }
+    ]},
+    { group: "Words about work", words: [
+      { t: "Position", aka: "Also called: job, role", m: "The job you want.", eg: "Position: <b>Receptionist</b>" },
+      { t: "Employer", aka: "", m: "The business or person you work for.", eg: "Employer: <b>Riverside Café</b>" },
+      { t: "Eligible to work", aka: "Also called: right to work", m: "You are allowed to work in New Zealand.", eg: "Citizens, residents and some visa holders are eligible" },
+      { t: "Citizen", aka: "", m: "A person who belongs to New Zealand. Many were born here. Others got citizenship later.", eg: "I am a New Zealand citizen" },
+      { t: "Resident", aka: "", m: "A person who has permission to live in New Zealand for a long time.", eg: "I am a New Zealand resident" },
+      { t: "Work visa", aka: "", m: "Permission from Immigration New Zealand to work here for a time. It has an end date.", eg: "My work visa ends on <b>30/06/2027</b>" },
+      { t: "Availability", aka: "", m: "The days and times you can work.", eg: "Monday to Friday, mornings" },
+      { t: "Full-time / Part-time / Casual", aka: "", m: "Full-time: about 40 hours a week. Part-time: fewer hours, often the same each week. Casual: hours change. You work when the employer needs you.", eg: "Part-time: 20 hours a week" },
+      { t: "Referee", aka: "Also called: reference", m: "A person who can tell an employer about you, like a past manager or a teacher. Usually not family.", eg: "Referee: <b>Daniel Ngata, my old manager</b>" }
+    ]}
+  ];
+  var PHRASES = [
+    "What does ___ mean?",
+    "Can you show me where to tap?",
+    "Is this box required?",
+    "Can you say that again more slowly, please?",
+    "Can you write that down for me, please?"
+  ];
+
+  (function renderVocab() {
+    var host = $("#vocab-groups");
+    VOCAB.forEach(function (g) {
+      var wrap = document.createElement("div"); wrap.className = "group";
+      wrap.innerHTML = "<h3>" + esc(g.group) + "</h3>";
+      var grid = document.createElement("div"); grid.className = "vocab";
+      g.words.forEach(function (w) {
+        var c = document.createElement("div"); c.className = "card word";
+        c.innerHTML = '<p class="term">' + esc(w.t) + "</p>" +
+          (w.aka ? '<p class="aka">' + esc(w.aka) + "</p>" : "") +
+          "<p>" + esc(w.m) + "</p>" +
+          '<p class="eg"><span class="sr-only">Example: </span>' + w.eg + "</p>";
+        c.appendChild(sayBtn(function () { return w.t.replace("*", "") + ". " + (w.aka ? w.aka + ". " : "") + w.m; }));
+        grid.appendChild(c);
+      });
+      wrap.appendChild(grid);
+      host.appendChild(wrap);
+    });
+    var ul = $("#phrases-1");
+    PHRASES.forEach(function (p) { var li = document.createElement("li"); li.textContent = p; ul.appendChild(li); });
+    $("#phrases-3").textContent = PHRASES.join("  •  ");
+  })();
+
+  /* ---------- Step 2: quiz ---------- */
+  var QUIZ = [
+    { q: "Your name is Lena Brooks. What is your surname?", o: ["Lena", "Brooks"], a: 1, why: "Brooks is the family name.", hint: "The surname is the family name." },
+    { q: "Which box must you fill in?", o: ["Phone number *", "Preferred name (optional)"], a: 0, why: "The star * means required.", hint: "Look for the star *." },
+    { q: "Your date of birth is 7 March 2002. How do you write it on a New Zealand form?", o: ["07/03/2002", "03/07/2002", "2002/03/07"], a: 0, why: "Day first, then month, then year.", hint: "In New Zealand the day comes first." },
+    { q: "A question has round radio buttons. How many can you choose?", o: ["Only one", "More than one"], a: 0, why: "Round radio buttons: choose one. Square tick boxes: often more than one.", hint: "Round buttons are different from square tick boxes." },
+    { q: "What is a referee?", o: ["A person who checks your form for mistakes", "A person who can tell an employer about you", "The manager at your new job"], a: 1, why: "A referee is often a past manager or a teacher.", hint: "The employer phones this person to ask about you." },
+    { q: "What does casual work mean?", o: ["You work 40 hours every week", "You work from home", "Your hours change. You work when the employer needs you."], a: 2, why: "Casual hours can change each week.", hint: "Think about hours that change." },
+    { q: "What is an IRD number?", o: ["Your tax number from Inland Revenue", "Your phone number", "Your visa number"], a: 0, why: "IRD stands for Inland Revenue Department.", hint: "It is about tax." },
+    { q: "When should you tap Submit?", o: ["Before you fill in the form", "After you check your answers"], a: 1, why: "Always check your answers first. You usually can only submit once.", hint: "What do you do first: check or send?" }
+  ];
+  var quizState = QUIZ.map(function () { return { done: false, tries: 0 }; });
+
+  function renderQuiz() {
+    var host = $("#quiz"); host.innerHTML = "";
+    QUIZ.forEach(function (item, qi) {
+      var fs = document.createElement("fieldset"); fs.className = "q";
+      var lg = document.createElement("legend");
+      lg.innerHTML = '<span class="qnum">Question ' + (qi + 1) + " of " + QUIZ.length + "</span>" + esc(item.q);
+      fs.appendChild(lg);
+      fs.appendChild(sayBtn(function () { return item.q + " " + item.o.map(function (o, i) { return "Answer " + (i + 1) + ": " + o + "."; }).join(" "); }));
+      var opts = document.createElement("div"); opts.className = "opts";
+      var fb = document.createElement("p"); fb.className = "feedback"; fb.setAttribute("aria-live", "polite");
+      item.o.forEach(function (text, oi) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "opt";
+        b.innerHTML = '<span class="mark" aria-hidden="true"></span><span>' + esc(text) + "</span>";
+        b.addEventListener("click", function () {
+          var st = quizState[qi]; if (st.done) return;
+          st.tries++;
+          if (oi === item.a) {
+            st.done = true;
+            b.classList.add("right"); b.querySelector(".mark").textContent = "✓";
+            b.setAttribute("aria-label", text + ". Correct.");
+            $$(".opt", opts).forEach(function (x) { x.disabled = true; });
+            fb.className = "feedback good";
+            fb.innerHTML = "✓ Correct! <span>" + esc(item.why) + "</span>";
+            checkQuizDone();
+          } else {
+            b.classList.add("wrong"); b.querySelector(".mark").textContent = "✗";
+            b.setAttribute("aria-label", text + ". Not right.");
+            b.disabled = true;
+            fb.className = "feedback bad";
+            fb.innerHTML = "✗ Not quite. Try again. <span>Hint: " + esc(item.hint) + "</span>";
+          }
+        });
+        opts.appendChild(b);
+      });
+      fs.appendChild(opts); fs.appendChild(fb);
+      host.appendChild(fs);
+    });
+  }
+  function checkQuizDone() {
+    if (!quizState.every(function (s) { return s.done; })) return;
+    var first = quizState.filter(function (s) { return s.tries === 1; }).length;
+    var box = $("#quiz-done");
+    box.innerHTML = "<strong>Ka pai! (Well done!)</strong> You answered all " + QUIZ.length + " questions. You got " + first + " right on the first try." +
+      (first < QUIZ.length ? " You kept trying and found the rest. That is how we learn." : "");
+    box.hidden = false;
+    markDone(2);
+  }
+
+  /* ---------- Step 3: practice application ---------- */
+  function radioVal(name) { var c = $('#app input[name="' + name + '"]:checked'); return c ? c.value : ""; }
+  var SECTIONS = [
+    { title: "Personal details", intro: "Tell the employer who you are.", fields: [
+      { id: "given", type: "text", label: "Given name(s)", req: true, need: "Type your given name.", hint: "Example: Lena", help: "Your own name, not your family name. Also called first name. If you have more than one given name, you can write them all.", check: "name" },
+      { id: "surname", type: "text", label: "Surname", req: true, need: "Type your surname (family name).", hint: "Example: Brooks", help: "Your family name. Also called last name or family name.", check: "name" },
+      { id: "preferred", type: "text", label: "Preferred name", req: false, hint: "Example: Liz (for Elizabeth). You can leave this empty.", help: "The name you like people to call you. Only fill this in if it is different from your given name.", check: "name" },
+      { id: "dob", type: "date", label: "Date of birth", req: true, need: "Type your date of birth: day, month and year.", hint: "Day / month / year. Example: 07 / 03 / 2002", help: "The day you were born. In New Zealand the day comes first, then the month, then the year. 07/03/2002 means 7 March 2002.", years: [1920, THIS_YEAR - 14] }
+    ]},
+    { title: "Contact details", intro: "Tell the employer how to contact you.", fields: [
+      { id: "mobile", type: "tel", label: "Mobile phone number", req: true, need: "Type your mobile phone number.", hint: "Example: 021 123 4567", help: "New Zealand mobile numbers start with 02. The employer may call or text you about an interview.", check: "mobile" },
+      { id: "email", type: "email", label: "Email address", req: true, need: "Type your email address.", hint: "Example: lena.b@example.com", help: "An email address has an @ in the middle. The employer may email you about the job.", check: "email" },
+      { id: "street", type: "text", label: "Street address", req: true, need: "Type your street address.", hint: "Example: 12 Kōwhai Street", help: "The number and the name of your street." },
+      { id: "suburb", type: "text", label: "Suburb or town", req: true, need: "Type your suburb or town.", hint: "Example: Riverside", help: "The area where you live." },
+      { id: "postcode", type: "text", inputmode: "numeric", maxlength: 4, w: "w4", label: "Postcode", req: true, need: "Type your postcode.", hint: "4 numbers. Example: 0610", help: "A postcode is 4 numbers for your area. You can find it on letters sent to your home.", check: "postcode" }
+    ]},
+    { title: "Right to work", intro: "Employers must check that you are allowed to work in New Zealand.", fields: [
+      { id: "eligible", type: "radio", label: "Are you eligible to work in New Zealand?", req: true, need: "Choose one answer.", hint: "Eligible means allowed. Choose one.", help: "Citizens and residents can work in New Zealand. Some visas also let you work. Choose the answer that is true for you, or a made-up answer for practice.", options: ["I am a New Zealand citizen", "I am a New Zealand resident", "I have a work visa", "I do not have the right to work in New Zealand yet"] },
+      { id: "visaexp", type: "date", label: "When does your work visa end?", req: true, need: "Type the date your work visa ends: day, month and year.", hint: "Day / month / year. Example: 30 / 06 / 2027", help: "Your visa has an end date (expiry date). After this day, you cannot work on that visa.", years: [THIS_YEAR - 1, THIS_YEAR + 10], showIf: function () { return radioVal("eligible") === "I have a work visa"; } },
+      { id: "ird", type: "text", inputmode: "numeric", maxlength: 11, w: "w-id", label: "IRD number", req: false, hint: "8 or 9 numbers. Example: 123-456-789. You can leave this empty.", help: "Your IRD number is your tax number from Inland Revenue (Te Tari Taake). Many employers ask for it after they offer you the job.", check: "ird" }
+    ]},
+    { title: "The job", intro: "Tell the employer which job you want.", fields: [
+      { id: "position", type: "select", label: "Position you are applying for", req: true, need: "Choose a position from the list.", hint: "Tap the box to see the list.", help: "Position means the job. A drop-down shows a list when you tap it. Choose one.", options: ["Office administrator", "Receptionist", "Retail assistant", "Kitchen hand", "Warehouse assistant"], placeholder: "Choose a position" },
+      { id: "worktype", type: "checks", label: "What type of work do you want?", req: true, need: "Tick at least one type of work.", hint: "Tick all that you want.", help: "Full-time is about 40 hours a week. Part-time is fewer hours, often the same each week. Casual means the hours change. You work when the employer needs you.", options: ["Full-time", "Part-time", "Casual"] },
+      { id: "heard", type: "select", label: "How did you hear about this job?", req: false, hint: "You can leave this empty.", help: "The employer wants to know where you saw the job advert.", options: ["A job website", "Work and Income", "A friend or family member", "Social media", "A sign in a shop window", "Other"], placeholder: "Choose one" }
+    ]},
+    { title: "Availability", intro: "Tell the employer when you can work.", fields: [
+      { id: "days", type: "checks", cols: true, label: "Which days can you work?", req: true, need: "Tick at least one day.", hint: "Tick all the days you can work.", help: "Availability means the days and times you can work. Only tick the days you can really work.", options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+      { id: "times", type: "checks", label: "What times of day can you work?", req: true, need: "Tick at least one time of day.", hint: "Tick all that are OK for you.", help: "Mornings are before 12 o'clock. Afternoons are from 12 to about 5 o'clock. Evenings are after 5 o'clock.", options: ["Mornings", "Afternoons", "Evenings"] },
+      { id: "start", type: "radio", label: "When can you start?", req: true, need: "Choose when you can start.", hint: "Choose one.", help: "The employer wants to know how soon you can begin the job.", options: ["Straight away", "In 1 to 2 weeks", "In more than 2 weeks"] }
+    ]},
+    { title: "Work experience and skills", intro: "Tell the employer what you have done. Jobs in other countries count. Volunteering and caring for family also give you skills.", fields: [
+      { id: "worked", type: "radio", label: "Have you had a paid job before?", req: true, need: "Choose Yes or No.", hint: "Choose one. Jobs in other countries count.", help: "If you choose Yes, you will see some more boxes about that job.", options: ["Yes", "No"] },
+      { id: "employer", type: "text", label: "Employer name", req: true, need: "Type the name of the business you worked for.", hint: "The business you worked for. Example: Riverside Café", help: "An employer is the business or person you work for.", showIf: function () { return radioVal("worked") === "Yes"; } },
+      { id: "jobtitle", type: "text", label: "Job title", req: true, need: "Type your job title.", hint: "The name of your job. Example: Cashier", help: "Your job title is the name of the job you did there.", showIf: function () { return radioVal("worked") === "Yes"; } },
+      { id: "from", type: "monthyear", label: "Start date", req: true, need: "Type the month and year you started.", hint: "Month / year. Example: 02 / 2023", help: "The month and the year you started this job.", showIf: function () { return radioVal("worked") === "Yes"; } },
+      { id: "stillthere", type: "check", label: "I still work here", req: false, showIf: function () { return radioVal("worked") === "Yes"; } },
+      { id: "to", type: "monthyear", label: "End date", req: true, need: "Type the month and year you finished, or tick 'I still work here'.", hint: "Month / year. Example: 11 / 2024", help: "The month and the year you finished this job.", showIf: function () { return radioVal("worked") === "Yes" && !$("#stillthere").checked; } },
+      { id: "about", type: "textarea", label: "Tell us about yourself", req: false, hint: "1 to 3 short sentences. You can tap a sentence starter to begin. You can leave this empty.", help: "Write about your skills and what you are good at. Short sentences are fine. Skills from home, study and volunteering count.", starters: ["I am good at ", "I enjoy ", "I have experience in ", "I want this job because "], max: 400 }
+    ]},
+    { title: "Referee", intro: "A referee is a person who can tell the employer about you. Many employers ask for two. Here you practise with one.", fields: [
+      { id: "refname", type: "text", label: "Referee's full name", req: true, need: "Type your referee's full name.", hint: "Example: Daniel Ngata", help: "A referee is often a past manager, a teacher or a tutor. Usually not a family member. In real life, always ask the person first.", check: "name" },
+      { id: "refrel", type: "text", label: "How does this person know you?", req: true, need: "Type how this person knows you.", hint: "Example: He was my manager at Riverside Café", help: "Say how you know this person. For example: my manager, my teacher." },
+      { id: "refphone", type: "tel", label: "Referee's phone number", req: true, need: "Type your referee's phone number.", hint: "Example: 021 765 4321", help: "The employer will call this number to ask about you.", check: "phone" }
+    ]},
+    { title: "Declaration", intro: "A declaration is a sentence you agree to. Read it before you tick.", fields: [
+      { id: "declare", type: "check", short: "Declaration", label:"I confirm that the information in this application is true and correct.", req: true, need: "Tick the box to agree to the declaration.", help: "When you tick this box, you are saying your answers are true. In a real application, it is important to tell the truth." }
+    ]}
+  ];
+  var FIELDS = {};
+  SECTIONS.forEach(function (s, si) { s.fields.forEach(function (f) { f.section = si; FIELDS[f.id] = f; }); });
+
+  function reqMark(f) {
+    return f.req ? '<span class="req" aria-hidden="true">*</span><span class="sr-only"> (required)</span>' : '<span class="opt-tag">(optional)</span>';
+  }
+  function helpHtml(f) {
+    return f.help ? '<details class="help"><summary>What does this mean?</summary><p>' + esc(f.help) + "</p></details>" : "";
+  }
+  function describedBy(f) { return (f.hint ? f.id + "-hint " : "") + f.id + "-err"; }
+
+  function fieldHtml(f) {
+    var id = f.id, h = "";
+    var hint = f.hint ? '<p class="hint" id="' + id + '-hint">' + esc(f.hint) + "</p>" : "";
+    var err = '<p class="err" id="' + id + '-err" hidden></p>';
+    if (f.type === "text" || f.type === "email" || f.type === "tel") {
+      var inputType = f.type === "email" ? "email" : f.type === "tel" ? "tel" : "text";
+      var im = f.inputmode || (f.type === "tel" ? "tel" : f.type === "email" ? "email" : "text");
+      h = '<div class="field" id="wrap-' + id + '"><label for="' + id + '">' + esc(f.label) + reqMark(f) + "</label>" + hint + err +
+        '<input type="' + inputType + '" id="' + id + '" name="' + id + '" inputmode="' + im + '" autocomplete="off" spellcheck="false"' +
+        (f.maxlength ? ' maxlength="' + f.maxlength + '"' : "") + (f.w ? ' class="' + f.w + '"' : "") +
+        ' aria-describedby="' + describedBy(f) + '">' + helpHtml(f) + "</div>";
+    } else if (f.type === "textarea") {
+      h = '<div class="field" id="wrap-' + id + '"><label for="' + id + '">' + esc(f.label) + reqMark(f) + "</label>" + hint + err +
+        '<div class="starters" aria-label="Sentence starters">' + f.starters.map(function (s, i) { return '<button type="button" data-starter="' + i + '">' + esc(s.trim()) + "…</button>"; }).join("") + "</div>" +
+        '<textarea id="' + id + '" name="' + id + '" maxlength="' + f.max + '" autocomplete="off" aria-describedby="' + describedBy(f) + " " + id + '-count"></textarea>' +
+        '<p class="count" id="' + id + '-count" aria-live="polite">You have written 0 words.</p>' + helpHtml(f) + "</div>";
+    } else if (f.type === "date" || f.type === "monthyear") {
+      var parts = f.type === "date" ? [["d", "Day", "w2", 2], ["m", "Month", "w2", 2], ["y", "Year", "w4", 4]] : [["m", "Month", "w2", 2], ["y", "Year", "w4", 4]];
+      h = '<fieldset class="field" id="wrap-' + id + '" aria-describedby="' + describedBy(f) + '"><legend>' + esc(f.label) + reqMark(f) + "</legend>" + hint + err +
+        '<div class="date">' + parts.map(function (p) {
+          return '<div><label for="' + id + "-" + p[0] + '">' + p[1] + '</label><input type="text" inputmode="numeric" id="' + id + "-" + p[0] + '" name="' + id + "-" + p[0] + '" maxlength="' + p[3] + '" class="' + p[2] + '" autocomplete="off"></div>';
+        }).join("") + "</div>" + helpHtml(f) + "</fieldset>";
+    } else if (f.type === "radio" || f.type === "checks") {
+      var t = f.type === "radio" ? "radio" : "checkbox";
+      h = '<fieldset class="field" id="wrap-' + id + '" aria-describedby="' + describedBy(f) + '"><legend>' + esc(f.label) + reqMark(f) + "</legend>" + hint + err +
+        '<div class="choices' + (f.cols ? " cols" : "") + '">' + f.options.map(function (o, i) {
+          return '<label class="choice"><input type="' + t + '" name="' + id + '" id="' + id + "-" + i + '" value="' + esc(o) + '"><span>' + esc(o) + "</span></label>";
+        }).join("") + "</div>" + helpHtml(f) + "</fieldset>";
+    } else if (f.type === "select") {
+      h = '<div class="field" id="wrap-' + id + '"><label for="' + id + '">' + esc(f.label) + reqMark(f) + "</label>" + hint + err +
+        '<select id="' + id + '" name="' + id + '" autocomplete="off" aria-describedby="' + describedBy(f) + '"><option value="">' + esc(f.placeholder || "Choose one") + "</option>" +
+        f.options.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select>" + helpHtml(f) + "</div>";
+    } else if (f.type === "check") {
+      h = '<div class="field" id="wrap-' + id + '">' + err +
+        '<label class="single" for="' + id + '"><input type="checkbox" id="' + id + '" name="' + id + '" aria-describedby="' + id + '-err"><span>' + esc(f.label) + (f.req ? reqMark(f) : "") + "</span></label>" + helpHtml(f) + "</div>";
+    }
+    return h;
+  }
+
+  (function renderSections() {
+    var host = $("#sections");
+    SECTIONS.forEach(function (s, si) {
+      var sec = document.createElement("div"); sec.className = "form-section"; sec.id = "sec-" + si; sec.hidden = si !== 0;
+      var head = document.createElement("div"); head.className = "section-intro";
+      head.innerHTML = '<h3 id="sec-h-' + si + '" tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.intro) + "</p>";
+      head.appendChild(sayBtn(function () {
+        var txt = s.title + ". " + s.intro + " ";
+        s.fields.forEach(function (f) { if (visible(f)) txt += f.label + (f.req ? "." : ", optional.") + " " + (f.hint ? f.hint + " " : ""); });
+        return txt;
+      }, "Hear this section"));
+      sec.appendChild(head);
+      var body = document.createElement("div"); body.className = "form-section";
+      body.innerHTML = s.fields.map(fieldHtml).join("");
+      sec.appendChild(body);
+      host.appendChild(sec);
+    });
+    // starters
+    $$("[data-starter]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var ta = $("#about"), s = FIELDS.about.starters[+b.getAttribute("data-starter")];
+        var v = ta.value;
+        if (v && !/\s$/.test(v)) v += /[.!?]$/.test(v) ? " " : ". ";
+        var next = v + s;
+        if (next.length <= FIELDS.about.max) ta.value = next;
+        ta.focus(); try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
+        updateCount();
+      });
+    });
+    $("#about").addEventListener("input", updateCount);
+    $("#app").addEventListener("change", updateVisibility);
+    $("#app").addEventListener("submit", function (e) { e.preventDefault(); });
+    updateVisibility();
+  })();
+
+  function updateCount() {
+    var n = ($("#about").value.trim().match(/\S+/g) || []).length;
+    $("#about-count").textContent = "You have written " + n + (n === 1 ? " word." : " words.");
+  }
+  function visible(f) { return !f.showIf || f.showIf(); }
+  function updateVisibility() {
+    Object.keys(FIELDS).forEach(function (id) { var f = FIELDS[id]; var w = $("#wrap-" + id); if (w) w.hidden = !visible(f); });
+  }
+
+  function val(f) {
+    var id = f.id;
+    switch (f.type) {
+      case "date": return ["d", "m", "y"].map(function (k) { return $("#" + id + "-" + k).value.trim(); });
+      case "monthyear": return ["m", "y"].map(function (k) { return $("#" + id + "-" + k).value.trim(); });
+      case "radio": return radioVal(id);
+      case "checks": return $$('#app input[name="' + id + '"]:checked').map(function (i) { return i.value; });
+      case "check": return $("#" + id).checked;
+      default: return $("#" + id).value.trim();
+    }
+  }
+  function isEmpty(f, v) {
+    if (f.type === "date" || f.type === "monthyear") return v.every(function (p) { return p === ""; });
+    if (f.type === "checks") return v.length === 0;
+    if (f.type === "check") return !v;
+    return v === "";
+  }
+
+  var NAME_RE;
+  try { NAME_RE = new RegExp("^[\\p{L}\\p{M}' .\\-]+$", "u"); } catch (e) { NAME_RE = /^[A-Za-zÀ-ÿĀ-ž' .\-]+$/; }
+  function digits(v) { return v.replace(/[\s\-().]/g, ""); }
+
+  var CHECKS = {
+    name: function (v) { return NAME_RE.test(v) ? null : "Use letters only. You can also use spaces, hyphens (-) and apostrophes (')."; },
+    mobile: function (v) {
+      var d = digits(v); if (d.indexOf("+64") === 0) d = "0" + d.slice(3);
+      return /^02\d{7,9}$/.test(d) ? null : "Check the mobile number. It starts with 02 and has 9 to 11 numbers. Example: 021 123 4567.";
+    },
+    phone: function (v) {
+      var d = digits(v); if (d.indexOf("+64") === 0) d = "0" + d.slice(3);
+      return /^0\d{8,10}$/.test(d) ? null : "Check the phone number. It starts with 0 and has 9 to 11 numbers. Example: 021 765 4321 or 09 123 4567.";
+    },
+    email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Check the email address. It needs an @ and a dot, like name@example.com."; },
+    postcode: function (v) { return /^\d{4}$/.test(v) ? null : "A postcode has 4 numbers, like 0610."; },
+    ird: function (v) { return /^\d{8,9}$/.test(digits(v)) ? null : "An IRD number has 8 or 9 numbers. Example: 123-456-789."; }
+  };
+
+  function checkDate(p, years) {
+    var d = p[0], m = p[1], y = p[2];
+    if (!d || !m || !y) return "Fill in all three boxes: day, month and year.";
+    if (!/^\d+$/.test(d + m + y)) return "Use numbers only for the date. Example: 07 / 03 / 2002.";
+    var mi = +m, di = +d, yi = +y;
+    if (mi < 1 || mi > 12) return "Check the month. It must be a number from 1 to 12. In New Zealand, the day comes first, then the month.";
+    if (y.length !== 4) return "Use 4 numbers for the year, like 2002.";
+    var dim = new Date(yi, mi, 0).getDate();
+    if (di < 1 || di > dim) return "Check the day. Month " + mi + " has " + dim + " days.";
+    if (years && (yi < years[0] || yi > years[1])) return "Check the year. It should be between " + years[0] + " and " + years[1] + ".";
+    return null;
+  }
+  function checkMonthYear(p) {
+    var m = p[0], y = p[1];
+    if (!m || !y) return "Fill in both boxes: month and year.";
+    if (!/^\d+$/.test(m + y)) return "Use numbers only. Example: 02 / 2023.";
+    if (+m < 1 || +m > 12) return "Check the month. It must be a number from 1 to 12.";
+    if (y.length !== 4) return "Use 4 numbers for the year, like 2023.";
+    if (+y < 1950 || +y > THIS_YEAR) return "Check the year. It should be between 1950 and " + THIS_YEAR + ".";
+    return null;
+  }
+  function validateField(f) {
+    if (!visible(f)) return null;
+    var v = val(f);
+    if (isEmpty(f, v)) return f.req ? f.need + (f.type === "check" ? "" : " This one is required (*).") : null;
+    if (f.type === "date") return checkDate(v, f.years);
+    if (f.type === "monthyear") return checkMonthYear(v);
+    if (f.check && CHECKS[f.check]) return CHECKS[f.check](v);
+    return null;
+  }
+
+  var everWrong = {};
+  function inputsOf(f) { var w = $("#wrap-" + f.id); return w ? $$("input, select, textarea", w).filter(function (el) { return el.type !== "button"; }) : []; }
+  function clearFieldError(f) {
+    var w = $("#wrap-" + f.id), e = $("#" + f.id + "-err");
+    if (w) w.classList.remove("has-err");
+    if (e) { e.hidden = true; e.textContent = ""; }
+    inputsOf(f).forEach(function (el) { el.removeAttribute("aria-invalid"); });
+  }
+  function setFieldError(f, msg) {
+    var w = $("#wrap-" + f.id), e = $("#" + f.id + "-err");
+    w.classList.add("has-err");
+    e.innerHTML = '<span><span class="sr-only">Error: </span>' + esc(msg) + "</span>";
+    e.hidden = false;
+    inputsOf(f).forEach(function (el) { if (el.type !== "radio" && el.type !== "checkbox") el.setAttribute("aria-invalid", "true"); });
+    everWrong[f.id] = true;
+  }
+  function focusField(f) {
+    var target;
+    if (f.type === "date") {
+      var p = val(f), keys = ["d", "m", "y"], msg = validateField(f) || "";
+      var k = /month/i.test(msg) ? "m" : /day/i.test(msg) && !/all three/i.test(msg) ? "d" : /year/i.test(msg) ? "y" : keys[Math.max(0, p.indexOf(""))];
+      target = $("#" + f.id + "-" + k);
+    } else if (f.type === "monthyear") {
+      var p2 = val(f); target = $("#" + f.id + "-" + (p2[0] === "" ? "m" : "y"));
+    } else target = inputsOf(f)[0];
+    if (target) target.focus();
+  }
+  function validateSection(si, show) {
+    var errs = [];
+    SECTIONS[si].fields.forEach(function (f) {
+      var msg = validateField(f);
+      if (show) clearFieldError(f);
+      if (msg) { errs.push({ f: f, msg: msg }); if (show) setFieldError(f, msg); }
+    });
+    return errs;
+  }
+  function showErrorSummary(errs) {
+    var box = $("#err-summary");
+    if (!errs.length) { box.hidden = true; box.innerHTML = ""; return; }
+    box.innerHTML = "<p><strong>Nearly there!</strong> Please fix " + (errs.length === 1 ? "1 thing" : errs.length + " things") + " before you go on:</p><ul>" +
+      errs.map(function (e, i) { return '<li><a href="#wrap-' + e.f.id + '" data-err="' + i + '"><strong>' + esc(e.f.short || e.f.label) + "</strong><br>" + esc(e.msg) + "</a></li>"; }).join("") + "</ul>";
+    box.hidden = false;
+    $$("[data-err]", box).forEach(function (b) { b.addEventListener("click", function (ev) { ev.preventDefault(); focusField(errs[+b.getAttribute("data-err")].f); }); });
+    box.focus();
+  }
+
+  var current = { step: 1, section: 0 };
+  var done = {};
+  function markDone(n) { done[n] = true; var s = $("#st-" + n); if (s) s.textContent = "✓ Done"; }
+
+  function showSection(si, focusHeading) {
+    current.section = si;
+    SECTIONS.forEach(function (_, i) { $("#sec-" + i).hidden = i !== si; });
+    $("#ptext").textContent = "Section " + (si + 1) + " of " + SECTIONS.length + ": " + SECTIONS[si].title;
+    $("#pfill").style.width = Math.round(((si + 1) / SECTIONS.length) * 100) + "%";
+    $("#sec-back").textContent = si === 0 ? "Back to the word check" : "Back: " + SECTIONS[si - 1].title;
+    $("#sec-next").textContent = si === SECTIONS.length - 1 ? "Check my application" : "Next: " + SECTIONS[si + 1].title;
+    showErrorSummary([]);
+    if (focusHeading !== false) { window.scrollTo(0, 0); var h = $("#sec-h-" + si); if (h) h.focus({ preventScroll: true }); }
+  }
+  $("#sec-next").addEventListener("click", function () {
+    var errs = validateSection(current.section, true);
+    if (errs.length) { showErrorSummary(errs); return; }
+    if (current.section < SECTIONS.length - 1) showSection(current.section + 1);
+    else { markDone(3); showStep(4); }
+  });
+  $("#sec-back").addEventListener("click", function () {
+    if (current.section === 0) showStep(2); else showSection(current.section - 1);
+  });
+  // Clear a field's error as soon as it is fixed
+  $("#app").addEventListener("input", liveFix);
+  $("#app").addEventListener("change", liveFix);
+  function liveFix(e) {
+    var w = e.target.closest(".field"); if (!w || !w.classList.contains("has-err")) return;
+    var f = FIELDS[w.id.replace("wrap-", "")]; if (f && !validateField(f)) clearFieldError(f);
+  }
+
+  /* ---------- Step 4: review and submit ---------- */
+  function pad(s) { return s.length === 1 ? "0" + s : s; }
+  function display(f) {
+    var v = val(f);
+    if (isEmpty(f, v)) return null;
+    if (f.type === "date") return pad(v[0]) + "/" + pad(v[1]) + "/" + v[2];
+    if (f.type === "monthyear") return pad(v[0]) + "/" + v[1];
+    if (f.type === "checks") return v.join(", ");
+    if (f.type === "check") return "Yes (ticked)";
+    return v;
+  }
+  function firstInvalidSection() {
+    for (var i = 0; i < SECTIONS.length; i++) if (validateSection(i, false).length) return i;
+    return -1;
+  }
+  function buildReview() {
+    var bad = firstInvalidSection();
+    $("#success").hidden = true;
+    if (bad !== -1) {
+      $("#review-wrap").hidden = true; $("#not-ready").hidden = false;
+      $("#not-ready-text").textContent = done[3]
+        ? "Something needs fixing in the section \"" + SECTIONS[bad].title + "\"."
+        : "You have not finished the practice application yet.";
+      $("#go-fix").onclick = function () { showStep(3, bad); validateSection(bad, true); showErrorSummary(validateSection(bad, false)); };
+      return;
+    }
+    $("#not-ready").hidden = true; $("#review-wrap").hidden = false;
+    var host = $("#review"); host.innerHTML = "";
+    SECTIONS.forEach(function (s, si) {
+      var box = document.createElement("div"); box.className = "card review-sec";
+      box.innerHTML = "<h3>" + esc(s.title) + "</h3>";
+      var dl = document.createElement("dl");
+      s.fields.forEach(function (f) {
+        if (!visible(f)) return;
+        if (f.id === "stillthere" && !val(f)) return;
+        var shown = display(f);
+        var row = document.createElement("div"); row.className = "review-row";
+        row.innerHTML = "<dt>" + esc(f.label) + "</dt><dd>" + (shown === null ? '<span class="empty">Not answered (optional)</span>' : esc(shown)) + "</dd>";
+        var b = document.createElement("button"); b.type = "button"; b.className = "btn quiet change"; b.textContent = "Change";
+        b.setAttribute("aria-label", "Change " + f.label);
+        b.addEventListener("click", function () { showStep(3, si, false); window.scrollTo(0, 0); focusField(f); });
+        row.appendChild(b);
+        dl.appendChild(row);
+      });
+      box.appendChild(dl);
+      host.appendChild(box);
+    });
+  }
+  $("#submit-btn").addEventListener("click", function () {
+    if (firstInvalidSection() !== -1) { buildReview(); return; }
+    var filled = 0;
+    Object.keys(FIELDS).forEach(function (id) { var f = FIELDS[id]; if (visible(f) && !isEmpty(f, val(f))) filled++; });
+    var fixed = Object.keys(everWrong).length;
+    var s = $("#success");
+    s.innerHTML = "<h2>Ka pai! (Well done!)</h2><p>You finished the practice job application.</p><ul>" +
+      "<li>You answered " + filled + " questions.</li>" +
+      "<li>" + (fixed ? "You found and fixed " + fixed + (fixed === 1 ? " thing" : " things") + ". Checking and fixing is an important skill." : "You had nothing to fix. Great checking!") + "</li>" +
+      "<li>Nothing was sent. This page is practice only.</li></ul>" +
+      "<p><strong>In a real application:</strong> you usually tap Submit only once. You often get an email to say the employer got your application. Check your inbox, and your junk folder too.</p>" +
+      '<div class="btn-row"><button type="button" class="btn" id="again-btn">Clear my answers and practise again</button></div>';
+    $("#review-wrap").hidden = true; s.hidden = false; markDone(4);
+    window.scrollTo(0, 0); s.focus({ preventScroll: true });
+    $("#again-btn").addEventListener("click", clearAll);
+  });
+
+  /* ---------- Navigation ---------- */
+  function showStep(n, section, focusHeading) {
+    current.step = n;
+    [1, 2, 3, 4].forEach(function (i) { $("#step-" + i).hidden = i !== n; });
+    $$("nav.steps button").forEach(function (b) {
+      if (+b.getAttribute("data-step") === n) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    $("#cleared-msg").hidden = true;
+    if (n === 3) showSection(typeof section === "number" ? section : current.section, false);
+    if (n === 4) buildReview();
+    if (focusHeading !== false) { window.scrollTo(0, 0); var h = $("#h-" + n); if (h) h.focus({ preventScroll: true }); }
+  }
+  $$("nav.steps button").forEach(function (b) { b.addEventListener("click", function () { showStep(+b.getAttribute("data-step")); }); });
+  $$("[data-goto]").forEach(function (b) { b.addEventListener("click", function () { showStep(+b.getAttribute("data-goto")); }); });
+  $("#to-2").addEventListener("click", function () { markDone(1); showStep(2); });
+  $("#to-3").addEventListener("click", function () { showStep(3, 0); });
+
+  /* ---------- Clear answers ---------- */
+  $("#clear-btn").addEventListener("click", function () { $("#clear-confirm").hidden = false; $("#clear-yes").focus(); });
+  $("#clear-no").addEventListener("click", function () { $("#clear-confirm").hidden = true; $("#clear-btn").focus(); });
+  $("#clear-yes").addEventListener("click", clearAll);
+  function clearAll() {
+    $("#app").reset();
+    Object.keys(FIELDS).forEach(function (id) { clearFieldError(FIELDS[id]); });
+    everWrong = {}; done = {};
+    [1, 2, 3, 4].forEach(function (i) { $("#st-" + i).textContent = ""; });
+    quizState = QUIZ.map(function () { return { done: false, tries: 0 }; });
+    renderQuiz(); $("#quiz-done").hidden = true;
+    updateVisibility(); updateCount(); showErrorSummary([]);
+    $("#success").hidden = true; $("#clear-confirm").hidden = true;
+    current.section = 0;
+    showStep(1);
+    $("#cleared-msg").hidden = false;
+  }
+
+  renderQuiz();
+  showStep(1, undefined, false);
+})();
+</script>
+</body>
+</html>
